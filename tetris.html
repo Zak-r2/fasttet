@@ -11,15 +11,15 @@
 }
 .whcell {
   background-color: white;
-  border: 1px solid gray;  
+  border: 1px solid #eee;  
 }
 .blcell {
-  background-color: gray;
-  border: 1px solid red;  
+  background-color: #f7f7f7;
+  border: 1px solid #eee;  
 }
 .grcell {
-  background-color: green;
-  border: 1px solid gray;  
+  background-color: #efe;
+  border: 1px solid #eee;  
 }
 
 </style>
@@ -53,11 +53,7 @@ function init(){
   actv = getAddition(actv, getNewFig());
 
   updateAll(stkn, actv);
-  //var timer = setInterval(loop, delay);
-  
-
-  //var timer = setTimeout(loop, delay);
-  var timer = setInterval(loop, 200);
+  var timer = setInterval(loop, delay);
 
   $(document).keydown(onKeyDown);
 }
@@ -67,13 +63,14 @@ function loop() {
 }
 
 function checkNextMove(newActv) {
-  var inters = 0;
+  var inters = 0,
+      oldarr = $.extend(true, [], actv);;
   
   inters = updateAll(stkn, actv);
 
   if (!newActv || inters) { // couldn't move down or active intersect stkn
 
-    if (inters) actv = move(actv, 0, -1)
+    if (inters) actv = move(actv, 0, -1); //
 
     stkn = getAddition(stkn, actv);
     updateAll(stkn, actv);
@@ -87,20 +84,23 @@ function checkNextMove(newActv) {
 }
 
 function onKeyDown(e) {
-   var newActv;
+  var newActv;
 
   switch(e.keyCode) {
-    case '37':  // left
+    case 37:  // left
       newActv = move(actv, -1, 0)
       break;
-    case '39':  // right
+    case 39:  // right
       newActv = move(actv, 1, 0)
       break;
-    case '38':  // up
-      
+    case 38:  // up
+      newActv = turn(actv, 1)
       break;
-    case '40':  // down
-    case '32':  // spacebar
+    case 40:  // down
+      newActv = turn(actv, -1)
+      break;
+
+    case 32:  // spacebar
       newActv = move(actv, 0, 1)
       break;
   }  
@@ -110,14 +110,23 @@ function onKeyDown(e) {
 function move(arr, xoff, yoff) {
   var i,
       cell,
+      coll,
       outarr = $.extend(true, [], arr); // copy by value
 
-  if (xoff > 0) {
-    outarr.push(outarr.shift());
+  if (xoff < 0) {
+    coll = outarr.shift();
+    for (i=0; i < nrow; i++) {
+      if (coll[i]) return arr
+    }
+    outarr.push(coll);
   }
 
-  if (xoff < 0) {
-    outarr.unshift(outarr.pop());
+  if (xoff > 0) {
+    coll = outarr.pop();
+    for (i=0; i < nrow; i++) {
+      if (coll[i]) return arr
+    }    
+    outarr.unshift(coll);
   }
  
   if (yoff > 0) {
@@ -135,6 +144,25 @@ function move(arr, xoff, yoff) {
       outarr[i].push(cell);
     }
   } 
+
+  return outarr;
+}
+
+function turn(arr, direction) {
+  /*
+      only rude draft of future func
+  */
+
+  var i,
+      j,
+      outarr = [];
+
+  for (i=0; i < ncol; i++) {
+    outarr[i] = [];
+    for (j=0; j < ncol; j++) {
+      outarr[i][j] = arr[j][i];
+    }    
+  }
 
   return outarr;
 }
@@ -171,7 +199,6 @@ function getNewFig() {
       min = 0,
       n = Math.floor(Math.random() * (max - min)) + min;
 
-  n = 0;// STUB
   return figs[n];
 }
 
