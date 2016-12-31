@@ -6,6 +6,10 @@
   border: 1px solid; 
   position: relative; 
 }
+.prev {  
+  border: 1px solid; 
+  position: relative; 
+}
 .cell {
   position: absolute;  
 }
@@ -38,6 +42,7 @@ var ncol = 10,
     stkn = [],
     size = 25,
     $stkn,
+	$prev,
     timer,
     delay = 500,
     cellClasses = ['whcell', 'blcell', 'grcell'],
@@ -47,6 +52,7 @@ var ncol = 10,
       x   : 0,
       y   : 0,
     },
+	nextFig,
 	score = 0,
 	$score,
 	$gameover,
@@ -93,7 +99,10 @@ function init(){
   $stkn = $('.stkn');
   $score = $('.score');
   $gameover = $('.gameover');
+  $prev = $('.prev');
   
+  $prev.width(size * 4);
+  $prev.height(size * 4);
 
   $stkn.width(size * ncol);
   $stkn.height(size * nrow);
@@ -107,7 +116,7 @@ function init(){
 function startNewGame() {
   $gameover.hide();
   score = 0;
-  stkn = prepareAllCells($stkn);
+  stkn = prepareAllCells($stkn, $prev);
   fig = getNewFig();
 
   drawAllCells(getAddition(stkn, fig).arr);
@@ -319,6 +328,14 @@ function getAddition(targ, figObj) {
 }
 
 function getNewFig() {
+  var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
+  
+  nextFig = makeFig();
+  showNextFig(nextFig);
+  return fig;
+}
+
+function makeFig() {
   return {
     type: Math.floor(Math.random() * 4),
     turn: Math.floor(Math.random() * 4),
@@ -327,8 +344,21 @@ function getNewFig() {
   };
 }
 
-function drawCell(i, j, v){
-    var $cell = $('.cell' + i + '-' + j);
+
+function showNextFig(figObj) {
+  var i,
+      j,
+      fig = figs[figObj.type][figObj.turn];
+	  
+  for (i=0; i < 4; i++) {
+    for (j=0; j < 4; j++) {
+        drawCell(i, j, fig[i] && fig[i][j] ? fig[i][j] : 0, '.prevcell');
+    }    
+  }
+}
+
+function drawCell(i, j, v, pefix){
+    var $cell = $(pefix + i + '-' + j);
  
     $cell.removeClass(cellClasses.join(' '));
     $cell.addClass(cellClasses[v]); 
@@ -340,12 +370,12 @@ function drawAllCells(stk){
 
   for (i=0; i < ncol; i++) {
     for (j=0; j < nrow; j++) {
-        drawCell(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0);
+        drawCell(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
     }    
   }
 }
 
-function prepareAllCells($container){
+function prepareAllCells($container, $prev){
   var i,
       j, 
       arr = [];
@@ -366,6 +396,22 @@ function prepareAllCells($container){
       $container.append($newcell);
     }    
   }
+  
+  for (i=0; i < 4; i++) {
+    for (j=0; j < 4; j++) {
+      var cls = 'prevcell' + i + '-' + j + ' cell',
+          $newcell = $( "<div class='" + cls + "'></div>" ),
+          l  = i * size,
+          t  = j * size;
+
+      $newcell.width(size)
+              .height(size)
+              .css({'left' : l, 'top' : t});
+
+      $prev.append($newcell);
+    }    
+  }
+  
   return arr;
 }
 
@@ -380,6 +426,7 @@ $(document).ready(function() {
 <body>
 <div class="gameover"><h3>Gameover</h3> click to continue</div>
 <span class="score_container">Score: <span class="score"></span></span>
+<div class="prev"></div>
 <div class="stkn"></div>
 
 </body>
