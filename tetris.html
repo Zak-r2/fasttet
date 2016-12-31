@@ -14,12 +14,15 @@
   border: 1px solid #ddd;  
 }
 .blcell {
-  background-color: #eee;
+  background-color: #aaa;
   border: 1px solid #ddd;  
 }
 .grcell {
-  background-color: #dfd;
+  background-color: #afas;
   border: 1px solid #ddd;  
+}
+.gameover {
+	display: none;
 }
 
 </style>
@@ -55,7 +58,7 @@ var ncol = 10,
            ],[
 
             [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],
-
+			
             [[0,0,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,0]],  
 
             [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],  
@@ -106,6 +109,17 @@ function onKeyDown(e) {
   }  
 }
 
+function holdThisFigAndGetNext() {
+    stkn = getAddition(stkn, fig).arr;
+    fig = getNewFig();
+    drawAllCells(stkn);
+}
+
+function gameOver(){
+	clearTimeout(timer);
+	$('.gameover').show();	
+};
+
 function move(x, y) {
   var nextFigState = $.extend(true, {}, fig),
       unionObj;
@@ -113,27 +127,15 @@ function move(x, y) {
   nextFigState.x += x;
   nextFigState.y += y;
 
-  if (isOutOfBoundsX(nextFigState)) {
-    return false;
-  }
-  
-  if (isOutOfBoundsY(nextFigState)) {
-
-    stkn = getAddition(stkn, fig).arr;
-    fig = getNewFig();
-    drawAllCells(stkn);
-    return false;
-  }  
+  if (!checkBounds(nextFigState)) return false;
 
   unionObj = getAddition(stkn, nextFigState);
   if (!unionObj.intersect) {
     fig = nextFigState;
     drawAllCells(unionObj.arr);
   } else {
-
-    stkn = getAddition(stkn, fig).arr;
-    fig = getNewFig();
-    drawAllCells(stkn);
+	if (y == 0) return false;
+	holdThisFigAndGetNext();
   }
 }
 
@@ -145,28 +147,28 @@ function turn(a) {
   if (nextFigState.turn > 3) nextFigState.turn = 0; 
   if (nextFigState.turn < 0) nextFigState.turn = 3; 
 
-  if (isOutOfBoundsX(nextFigState)) {
-    return false;
-  }
-  
-  if (isOutOfBoundsY(nextFigState)) {
-
-    stkn = getAddition(stkn, fig).arr;
-    fig = getNewFig();
-    drawAllCells(stkn);
-    return false;
-  }  
+  if (!checkBounds(nextFigState)) return false;
 
   unionObj = getAddition(stkn, nextFigState);
   if (!unionObj.intersect) {
     fig = nextFigState;
     drawAllCells(unionObj.arr);
   } else {
+	return false;
+  }  
+}
 
+function checkBounds(nextFigState){
+  if (isOutOfBoundsX(nextFigState)) {
+    return false;
+  }  
+  if (isOutOfBoundsY(nextFigState)) {
     stkn = getAddition(stkn, fig).arr;
     fig = getNewFig();
     drawAllCells(stkn);
+    return false;
   }  
+  return true;  
 }
 
 function isOutOfBoundsX(figObj) {
@@ -294,6 +296,6 @@ $(document).ready(function() {
 <body>
 
 <div class="stkn"></div>
-
+<div class="gameover">gameover</div>
 </body>
 </html>
