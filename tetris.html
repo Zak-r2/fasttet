@@ -125,13 +125,24 @@ function holdThisFigAndGetNext() {
 		gameOver();
 	}
     drawAllCells(stkn);
-	console.log(checkLines());
+	removeFullLines(checkLines());
 }
 
 function gameOver(){
 	clearTimeout(timer);
 	$('.gameover').show();	
 	$('.gameover').one('click', init);		
+}
+
+function removeFullLines(lines){
+  var i;
+  for (var e in lines) {
+	for (i=0; i < ncol; i++) {
+	  stkn[i].splice(lines[e], 1);
+      stkn[i].unshift(0);
+	}
+  }
+  drawAllCells(stkn);
 }
 
 function checkLines() {
