@@ -1,520 +1,549 @@
 <html>
-  <head>
-    <title>fastet v1.0beta</title>
-<style>
-.stkn {  
-  border: 1px solid; 
-  position: relative; 
-}
-.prev {  
-  border: 1px solid; 
-  position: relative; 
-}
-.cell {
-  position: absolute;  
-}
-.whcell {
-  background-color: white;
-  border: 1px solid #ddd;  
-}
-.blcell {
-  background-color: #aaa;
-  border: 1px solid #ddd;  
-}
-.grcell {
-  background-color: #afas;
-  border: 1px solid #ddd;  
-}
-.gameover {
-	display: none;
-	padding: 10px;
-	border: 1px blue dashed;
-	border-radius: 5px;
-	margin: 10px 0;
-}
 
-</style>
-<script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
-<script>
+<head>
+    <title>fastet v1.0beta2</title>
+    <style>
+        .stkn {
+            border: 1px solid;
+            position: relative;
+        }
+		.infoContainer {
+			position: absolute;
+			left: 300px;
+		}
+        
+        .prev {
+            border: 1px solid;
+            position: relative;
+        }
+        
+        .cell {
+            position: absolute;
+        }
+        
+        .whcell {
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        
+        .blcell {
+            background-color: #aaa;
+            border: 1px solid #ddd;
+        }
+        
+        .grcell {
+            background-color: #afas;
+            border: 1px solid #ddd;
+        }
+        
+        .gameover {
+            display: none;
+            padding: 10px;
+            border: 1px blue dashed;
+            border-radius: 5px;
+            margin: 10px 0;
+			position: absolute;
+			z-index: 2;
+			background: white;
+			text-align: center;
+        }
+    </style>
+    <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
+    <script>
+        var ncol = 10,
+            nrow = 20,
+            stkn = [],
+            size = 25,
+            $stkn,
+            $prev,
+            timer,
+            level,
+            cellClasses = ['whcell', 'blcell', 'grcell'],
+            fig = {
+                type: 0,
+                turn: 0,
+                x: 0,
+                y: 0,
+            },
+            nextFig,
+            score = 0,
+            linesCnt = 0,
+            $score,
+            $lines,
+            $level,
+            $gameover,
+            figoffsetx,
 
-var ncol = 10,
-    nrow = 20,
-    stkn = [],
-    size = 25,
-    $stkn,
-	$prev,
-    timer,
-	level,
-    cellClasses = ['whcell', 'blcell', 'grcell'],
-    fig = {
-      type: 0,
-      turn: 0,
-      x   : 0,
-      y   : 0,
-    },
-	nextFig,
-	score = 0,
-	linesCnt = 0,
-	$score,
-	$lines,
-	$level,
-	$gameover,
-    figoffsetx,
-    // Array[figType][figTurn][col][row]
-    figs = [[
-            [[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],  // fig l
+			// Array[figType][figTurn][col][row]
+			figs = [[
+					[[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],  // fig l
 
-            [[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],  
+					[[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],  
 
-            [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],  
+					[[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],  
 
-            [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]  
-           ],[
-            [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]], // fig z
-			
-            [[0,0,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,0]],  
+					[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]  
+				   ],[
+					[[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]], // fig z
+					
+					[[0,0,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,0]],  
 
-            [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],  
+					[[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],  
 
-            [[0,0,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,0]]  
-           ],[
-            [[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]], // fig s
-			
-            [[0,0,0,0],[0,0,1,1],[0,1,1,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,1,1,0],[0,0,1,1],[0,0,0,0]]  
+				   ],[
+					[[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]], // fig s
+					
+					[[0,0,0,0],[0,0,1,1],[0,1,1,0],[0,0,0,0]],  
 
-            [[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],  
+					[[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],  
 
-            [[0,0,0,0],[0,0,1,1],[0,1,1,0],[0,0,0,0]]  
-           ],[
-            [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]], // fig o
-			
-            [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,0,1,1],[0,1,1,0],[0,0,0,0]]  
+				   ],[
+					[[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]], // fig o
+					
+					[[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],  
 
-            [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+					[[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
 
-            [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]]  
-           ],[
-            [[0,1,0,0],[0,1,0,0],[0,1,1,0],[0,0,0,0]], // fig L
-			
-            [[0,0,0,0],[1,1,1,0],[1,0,0,0],[0,0,0,0]],  
+					[[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]]  
+				   ],[
+					[[0,1,0,0],[0,1,0,0],[0,1,1,0],[0,0,0,0]], // fig L
+					
+					[[0,0,0,0],[1,1,1,0],[1,0,0,0],[0,0,0,0]],  
 
-            [[0,0,0,0],[0,1,1,0],[0,0,1,0],[0,0,1,0]],  
+					[[0,0,0,0],[0,1,1,0],[0,0,1,0],[0,0,1,0]],  
 
-            [[0,0,0,0],[0,0,1,0],[1,1,1,0],[0,0,0,0]]  
-           ],[
-            [[0,0,1,0],[0,0,1,0],[0,1,1,0],[0,0,0,0]], // fig J
-			
-            [[0,0,0,0],[1,0,0,0],[1,1,1,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,0,1,0],[1,1,1,0],[0,0,0,0]]  
+				   ],[
+					[[0,0,1,0],[0,0,1,0],[0,1,1,0],[0,0,0,0]], // fig J
+					
+					[[0,0,0,0],[1,0,0,0],[1,1,1,0],[0,0,0,0]],  
 
-            [[0,0,0,0],[0,1,1,0],[0,1,0,0],[0,1,0,0]],  
+					[[0,0,0,0],[0,1,1,0],[0,1,0,0],[0,1,0,0]],  
 
-            [[0,0,0,0],[1,1,1,0],[0,0,1,0],[0,0,0,0]]  
-           ],[
-            [[1,1,1,0],[0,1,0,0],[0,0,0,0],[0,0,0,0]], // fig T
-			
-            [[0,0,1,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],  
+					[[0,0,0,0],[1,1,1,0],[0,0,1,0],[0,0,0,0]]  
+				   ],[
+					[[1,1,1,0],[0,1,0,0],[0,0,0,0],[0,0,0,0]], // fig T
+					
+					[[0,0,1,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],  
 
-            [[0,0,0,0],[0,1,0,0],[1,1,1,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,1,0,0],[1,1,1,0],[0,0,0,0]],  
 
-            [[1,0,0,0],[1,1,0,0],[1,0,0,0],[0,0,0,0]]  
-           ]
-		   
-	     ];
+					[[1,0,0,0],[1,1,0,0],[1,0,0,0],[0,0,0,0]]  
+				   ]
+				   
+				 ];
 
-    
-function init(){
-  $stkn = $('.stkn');
-  $score = $('.score');
-  $gameover = $('.gameover');
-  $prev = $('.prev');
-  $lines = $('.lines');
-  $level = $('.level');
-  
-  $prev.width(size * 4);
-  $prev.height(size * 4);
 
-  $stkn.width(size * ncol);
-  $stkn.height(size * nrow);
+        function init() {
+            $stkn = $('.stkn');
+            $score = $('.score');
+            $gameover = $('.gameover');
+            $prev = $('.prev');
+            $lines = $('.lines');
+            $level = $('.level');
 
-  figoffsetx = Math.floor(ncol / 2) - 2 ;  
+            $prev.width(size * 4);
+            $prev.height(size * 4);
 
-  startNewGame();  
-}
+            $stkn.width(size * ncol);
+            $stkn.height(size * nrow);
 
-function startNewGame() {
-  $gameover.hide();
-  score = 0;
-  linesCnt = 0;
-  level = 0;
-  stkn = prepareAllCells($stkn, $prev);
-  fig = getNewFig();
+            figoffsetx = Math.floor(ncol / 2) - 2;
 
-  drawAllCells(getAddition(stkn, fig).arr);
-  updateScore();
- 
-  setSpeed(level);
-  $(document).keydown(onKeyDown);
-}
-
-function setSpeed(lvl) {
-  var delay;
-  
-  switch(lvl) {
-    case 0:
-	  delay = 1000;	
-      break;
-    case 1:
-	  delay = 850;    
-      break;	  
-    case 2:
-	  delay = 700;    
-      break;	  
-    case 3:
-	  delay = 750;    
-      break;	  
-    case 4:
-	  delay = 600;    
-      break;	  
-    case 5:
-	  delay = 500;    
-      break;	  
-    case 6:
-	  delay = 400;    
-      break;	  
-    case 7:
-	  delay = 250;    
-      break;	  
-    case 8:
-	  delay = 100;    
-      break;	  
-    case 9:
-	  delay = 50;    
-      break;
-  } 
-  if (timer) clearTimeout(timer);
-  timer = setInterval(function() {
-            move(0, 1);
-          }, delay);    
-}
-
-function onKeyDown(e) {
-  switch(e.keyCode) {
-    case 37:  // left
-      move(-1, 0);
-      break;
-    case 39:  // right
-      move(1, 0);
-      break;
-    case 38:  // up
-      turn(1);
-      break;
-    case 40:  // down
-      turn(-1);
-      break;
-
-    case 32:  // spacebar
-      move(0, 1);
-      break;
-  }  
-}
-
-function holdThisFigAndGetNext() {
-    stkn = getAddition(stkn, fig).arr;
-    fig = getNewFig();
-
-	if (getAddition(stkn, fig).intersect) {
-		gameOver();
-		return;
-	}
-    drawAllCells(stkn);
-	removeFullLines(checkLines());
-}
-
-function gameOver(){
-	clearTimeout(timer);
-	$(document).off('keydown');
-	$('.gameover').show();	
-	$('.gameover').one('click', startNewGame);		
-}
-
-function removeFullLines(lines){
-  var i
-	  addition = 0;
-
-  linesCnt += lines.length;
-  
-  level = Math.floor(linesCnt / 100);
-  if (level > 9) level = 9;
-    
-  setSpeed(level);
-  
-  switch(lines.length) {
-    case 1: 
-      addition = 100;
-      break;
-    case 2:
-	  addition = 300;
-      break;
-    case 3:
-	  addition = 700;
-      break;
-    case 4:
-	  addition = 1500;
-      break;
-  } 
-  
-  score += Math.floor(addition * 0.25 * (level + 1));
-  
-  for (var e in lines) {
-	for (i=0; i < ncol; i++) {
-	  stkn[i].splice(lines[e], 1);
-      stkn[i].unshift(0);
-	}
-  }
-  drawAllCells(stkn);
-  updateScore();
-}
-
-function checkLines() {
-  var i,
-      j, 
-      res = [],
-      cnt;
-
-    for (j=0; j < nrow; j++) {
-	  cnt = 0;	
-	  for (i=0; i < ncol; i++) {
-		if (stkn[i][j] > 0) cnt++;
-	  }    
-	  if (cnt == ncol) {
-		res.push(j);
-	  }	  
-	}
-	return res;
-}
-
-function updateScore() {
-  $score.html(score);
-  $lines.html(linesCnt);
-  $level.html(level);
-}
-
-function move(x, y) {
-  var nextFigState = $.extend(true, {}, fig),
-      unionObj;
-
-  nextFigState.x += x;
-  nextFigState.y += y;
-
-  if (!checkBounds(nextFigState)) return false;
-
-  unionObj = getAddition(stkn, nextFigState);
-  if (!unionObj.intersect) {
-    fig = nextFigState;
-    drawAllCells(unionObj.arr);
-  } else {
-	if (y == 0) return false;
-	holdThisFigAndGetNext();
-  }
-}
-
-function turn(a) {
-  var nextFigState = $.extend(true, {}, fig),
-      unionObj;
-
-  nextFigState.turn += a;
-  if (nextFigState.turn > 3) nextFigState.turn = 0; 
-  if (nextFigState.turn < 0) nextFigState.turn = 3; 
-
-  if (!checkBounds(nextFigState)) return false;
-
-  unionObj = getAddition(stkn, nextFigState);
-  if (!unionObj.intersect) {
-    fig = nextFigState;
-    drawAllCells(unionObj.arr);
-  } else {
-	return false;
-  }  
-}
-
-function checkBounds(nextFigState){
-  if (isOutOfBoundsX(nextFigState)) {
-    return false;
-  }  
-  if (isOutOfBoundsY(nextFigState)) {
-	holdThisFigAndGetNext();
-    return false;
-  }  
-  return true;  
-}
-
-function isOutOfBoundsX(figObj) {
-  var i,
-      j,
-      figArr = figs[figObj.type][figObj.turn];
-
-  for (i=0; i < 4; i++) {    
-    for (j=0; j < 4; j++) {
-      if (figArr[i][j] && i + figObj.x > ncol - 1) return true;
-      if (figArr[i][j] && i + figObj.x < 0       ) return true;
-    }
-  }
-  return false;
-}
-
-function isOutOfBoundsY(figObj) {
-  var i,
-      j,
-      figArr = figs[figObj.type][figObj.turn];
-
-  for (i=0; i < 4; i++) {    
-    for (j=0; j < 4; j++) {
-      if (figArr[i][j] && j + figObj.y > nrow - 1) return true;
-    }
-  }
-  return false;
-}
-
-function getAddition(targ, figObj) {
-  var i,
-      j,
-      result = $.extend(true, [], targ),
-      figArr = figs[figObj.type][figObj.turn],
-      intersect = 0,
-      nx,
-      ny;
-
-  
-  for (i=0; i < 4; i++) {    
-    nx = i + figObj.x;
-
-    for (j=0; j < 4; j++) {
-      ny = j + figObj.y;
-
-      if (nx > -1 && ny > -1 && nx < ncol && ny < nrow) {
-
-        if (targ[nx][ny]) {
-
-          if (figArr[i][j]) {
-
-            result[nx][ny] = 1;
-            intersect++;
-
-          }
-        } else {
-          result[nx][ny] = figArr[i][j];  
+            startNewGame();
         }
 
-      }
-    }    
-  }
-  return {arr: result, intersect: intersect};
-}
+        function startNewGame() {
+            $gameover.hide();
+            score = 0;
+            linesCnt = 0;
+            level = 0;
+            stkn = prepareAllCells($stkn, $prev);
+            fig = getNewFig();
 
-function getNewFig() {
-  var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
-  
-  nextFig = makeFig();
-  showNextFig(nextFig);
-  return fig;
-}
+            drawAllCells(getAddition(stkn, fig).arr);
+            updateScore();
 
-function makeFig() {
-  return {
-    type: Math.floor(Math.random() * 7),
-    turn: Math.floor(Math.random() * 4),
-    x   : figoffsetx,
-    y   : 0,
-  };
-}
+            setSpeed(level);
+            $(document).keydown(onKeyDown);
+        }
 
-function showNextFig(figObj) {
-  var i,
-      j,
-      fig = figs[figObj.type][figObj.turn];
-	  
-  for (i=0; i < 4; i++) {
-    for (j=0; j < 4; j++) {
-        drawCell(i, j, fig[i] && fig[i][j] ? fig[i][j] : 0, '.prevcell');
-    }    
-  }
-}
+        function setSpeed(lvl) {
+            var delay;
 
-function drawCell(i, j, v, pefix){
-    var $cell = $(pefix + i + '-' + j);
-	
-    $cell.removeClass(cellClasses.join(' '));
-    $cell.addClass(cellClasses[v]); 
-}
+            switch (lvl) {
+                case 0:
+                    delay = 1000;
+                    break;
+                case 1:
+                    delay = 850;
+                    break;
+                case 2:
+                    delay = 700;
+                    break;
+                case 3:
+                    delay = 750;
+                    break;
+                case 4:
+                    delay = 600;
+                    break;
+                case 5:
+                    delay = 500;
+                    break;
+                case 6:
+                    delay = 400;
+                    break;
+                case 7:
+                    delay = 250;
+                    break;
+                case 8:
+                    delay = 100;
+                    break;
+                case 9:
+                    delay = 50;
+                    break;
+            }
+            if (timer) clearTimeout(timer);
+            timer = setInterval(function() {
+                move(0, 1);
+            }, delay);
+        }
 
-function drawAllCells(stk){
-  var i,
-      j;
+        function onKeyDown(e) {
+            switch (e.keyCode) {
+                case 37: // left
+                    move(-1, 0);
+                    break;
+                case 39: // right
+                    move(1, 0);
+                    break;
+                case 38: // up
+                    turn(1);
+                    break;
+                case 40: // down
+                    turn(-1);
+                    break;
 
-  for (i=0; i < ncol; i++) {
-    for (j=0; j < nrow; j++) {
-        drawCell(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
-    }    
-  }
-}
+                case 32: // spacebar
+                    move(0, 1);
+                    break;
+            }
+        }
 
-function prepareAllCells($container, $prev){
-  var i,
-      j, 
-      arr = [];
+        function holdThisFigAndGetNext() {
+            stkn = getAddition(stkn, fig).arr;
+            fig = getNewFig();
 
-  for (i=0; i < ncol; i++) {
-    arr[i] = [];
-    for (j=0; j < nrow; j++) {
-      arr[i][j] = 0;
-      var cls = 'cell' + i + '-' + j + ' cell',
-          $newcell = $( "<div class='" + cls + "'></div>" ),
-          l  = i * size,
-          t  = j * size;
+            if (getAddition(stkn, fig).intersect) {
+                gameOver();
+                return;
+            }
+            drawAllCells(stkn);
+            removeFullLines(checkLines());
+        }
 
-      $newcell.width(size)
-              .height(size)
-              .css({'left' : l, 'top' : t});
+        function gameOver() {
+            clearTimeout(timer);
+            $(document).off('keydown');
+            $('.gameover').show();
+            $('.gameover').one('click', startNewGame);
+        }
 
-      $container.append($newcell);
-    }    
-  }
-  
-  for (i=0; i < 4; i++) {
-    for (j=0; j < 4; j++) {
-      var cls = 'prevcell' + i + '-' + j + ' cell',
-          $newcell = $( "<div class='" + cls + "'></div>" ),
-          l  = i * size,
-          t  = j * size;
+        function removeFullLines(lines) {
+            var i
+            addition = 0;
 
-      $newcell.width(size)
-              .height(size)
-              .css({'left' : l, 'top' : t});
+            linesCnt += lines.length;
 
-      $prev.append($newcell);
-    }    
-  }
-  
-  return arr;
-}
+            level = Math.floor(linesCnt / 100);
+            if (level > 9) level = 9;
 
-$(document).ready(function() {
-  init();
-});
+            setSpeed(level);
+
+            switch (lines.length) {
+                case 1:
+                    addition = 100;
+                    break;
+                case 2:
+                    addition = 300;
+                    break;
+                case 3:
+                    addition = 700;
+                    break;
+                case 4:
+                    addition = 1500;
+                    break;
+            }
+
+            score += Math.floor(addition * 0.25 * (level + 1));
+
+            for (var e in lines) {
+                for (i = 0; i < ncol; i++) {
+                    stkn[i].splice(lines[e], 1);
+                    stkn[i].unshift(0);
+                }
+            }
+            drawAllCells(stkn);
+            updateScore();
+        }
+
+        function checkLines() {
+            var i,
+                j,
+                res = [],
+                cnt;
+
+            for (j = 0; j < nrow; j++) {
+                cnt = 0;
+                for (i = 0; i < ncol; i++) {
+                    if (stkn[i][j] > 0) cnt++;
+                }
+                if (cnt == ncol) {
+                    res.push(j);
+                }
+            }
+            return res;
+        }
+
+        function updateScore() {
+            $score.html(score);
+            $lines.html(linesCnt);
+            $level.html(level);
+        }
+
+        function move(x, y) {
+            var nextFigState = $.extend(true, {}, fig),
+                unionObj;
+
+            nextFigState.x += x;
+            nextFigState.y += y;
+
+            if (!checkBounds(nextFigState)) return false;
+
+            unionObj = getAddition(stkn, nextFigState);
+            if (!unionObj.intersect) {
+                fig = nextFigState;
+                drawAllCells(unionObj.arr);
+            } else {
+                if (y == 0) return false;
+                holdThisFigAndGetNext();
+            }
+        }
+
+        function turn(a) {
+            var nextFigState = $.extend(true, {}, fig),
+                unionObj;
+
+            nextFigState.turn += a;
+            if (nextFigState.turn > 3) nextFigState.turn = 0;
+            if (nextFigState.turn < 0) nextFigState.turn = 3;
+
+            if (!checkBounds(nextFigState)) return false;
+
+            unionObj = getAddition(stkn, nextFigState);
+            if (!unionObj.intersect) {
+                fig = nextFigState;
+                drawAllCells(unionObj.arr);
+            } else {
+                return false;
+            }
+        }
+
+        function checkBounds(nextFigState) {
+            if (isOutOfBoundsX(nextFigState)) {
+                return false;
+            }
+            if (isOutOfBoundsY(nextFigState)) {
+                holdThisFigAndGetNext();
+                return false;
+            }
+            return true;
+        }
+
+        function isOutOfBoundsX(figObj) {
+            var i,
+                j,
+                figArr = figs[figObj.type][figObj.turn];
+
+            for (i = 0; i < 4; i++) {
+                for (j = 0; j < 4; j++) {
+                    if (figArr[i][j] && i + figObj.x > ncol - 1) return true;
+                    if (figArr[i][j] && i + figObj.x < 0) return true;
+                }
+            }
+            return false;
+        }
+
+        function isOutOfBoundsY(figObj) {
+            var i,
+                j,
+                figArr = figs[figObj.type][figObj.turn];
+
+            for (i = 0; i < 4; i++) {
+                for (j = 0; j < 4; j++) {
+                    if (figArr[i][j] && j + figObj.y > nrow - 1) return true;
+                }
+            }
+            return false;
+        }
+
+        function getAddition(targ, figObj) {
+            var i,
+                j,
+                result = $.extend(true, [], targ),
+                figArr = figs[figObj.type][figObj.turn],
+                intersect = 0,
+                nx,
+                ny;
 
 
-</script>
+            for (i = 0; i < 4; i++) {
+                nx = i + figObj.x;
 
-  </head>
+                for (j = 0; j < 4; j++) {
+                    ny = j + figObj.y;
+
+                    if (nx > -1 && ny > -1 && nx < ncol && ny < nrow) {
+
+                        if (targ[nx][ny]) {
+
+                            if (figArr[i][j]) {
+
+                                result[nx][ny] = 1;
+                                intersect++;
+
+                            }
+                        } else {
+                            result[nx][ny] = figArr[i][j];
+                        }
+
+                    }
+                }
+            }
+            return {
+                arr: result,
+                intersect: intersect
+            };
+        }
+
+        function getNewFig() {
+            var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
+
+            nextFig = makeFig();
+            showNextFig(nextFig);
+            return fig;
+        }
+
+        function makeFig() {
+            return {
+                type: Math.floor(Math.random() * 7),
+                turn: Math.floor(Math.random() * 4),
+                x: figoffsetx,
+                y: 0,
+            };
+        }
+
+        function showNextFig(figObj) {
+            var i,
+                j,
+                fig = figs[figObj.type][figObj.turn];
+
+            for (i = 0; i < 4; i++) {
+                for (j = 0; j < 4; j++) {
+                    drawCell(i, j, fig[i] && fig[i][j] ? fig[i][j] : 0, '.prevcell');
+                }
+            }
+        }
+
+        function drawCell(i, j, v, pefix) {
+            var $cell = $(pefix + i + '-' + j);
+
+            $cell.removeClass(cellClasses.join(' '));
+            $cell.addClass(cellClasses[v]);
+        }
+
+        function drawAllCells(stk) {
+            var i,
+                j;
+
+            for (i = 0; i < ncol; i++) {
+                for (j = 0; j < nrow; j++) {
+                    drawCell(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
+                }
+            }
+        }
+
+        function prepareAllCells($container, $prev) {
+            var i,
+                j,
+                arr = [];
+
+            for (i = 0; i < ncol; i++) {
+                arr[i] = [];
+                for (j = 0; j < nrow; j++) {
+                    arr[i][j] = 0;
+                    var cls = 'cell' + i + '-' + j + ' cell',
+                        $newcell = $("<div class='" + cls + "'></div>"),
+                        l = i * size,
+                        t = j * size;
+
+                    $newcell.width(size)
+                        .height(size)
+                        .css({
+                            'left': l,
+                            'top': t
+                        });
+
+                    $container.append($newcell);
+                }
+            }
+
+            for (i = 0; i < 4; i++) {
+                for (j = 0; j < 4; j++) {
+                    var cls = 'prevcell' + i + '-' + j + ' cell',
+                        $newcell = $("<div class='" + cls + "'></div>"),
+                        l = i * size,
+                        t = j * size;
+
+                    $newcell.width(size)
+                        .height(size)
+                        .css({
+                            'left': l,
+                            'top': t
+                        });
+
+                    $prev.append($newcell);
+                }
+            }
+
+            return arr;
+        }
+
+        $(document).ready(function() {
+            init();
+        });
+    </script>
+
+</head>
+
 <body>
-<div class="gameover"><h3>Gameover</h3> click to continue</div>
-<div class="prev"></div>
-<span class="score_container">
-	Score: <span class="score"></span>
-	Lines: <span class="lines"></span>
-	Level: <span class="level"></span>	
-	</span>
-<div class="stkn"></div>
+	<div class="infoContainer">
+		<div class="prev"></div>
+		<span class="score_container">
+			Score: <span class="score"></span> 
+			Lines: <span class="lines"></span> 
+			Level: <span class="level"></span>
+		</span>
+	</div>
+    <div class="stkn">
+		<div class="gameover">
+			<h3>Gameover</h3>
+			click to continue
+		</div>	
+	</div>
 
 </body>
+
 </html>
