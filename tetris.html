@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <title>fastet v1.0beta2</title>
     <style>
@@ -35,6 +34,28 @@
             background-color: #afas;
             border: 1px solid #ddd;
         }
+		
+		.c1 {
+		    background-color: #00f0f0;
+		}
+		.c2 {
+		    background-color: #0000f0;
+		}
+		.c3 {
+		    background-color: #f0a000;
+		}
+		.c4 {
+		    background-color: #f0f000;
+		}
+		.c5 {
+		    background-color: #00f000;
+		}
+		.c6 {
+		    background-color: #a000f0;
+		}
+		.c7 {
+		    background-color: #f00000;
+		}		
         
         .gameover {
             display: none;
@@ -58,7 +79,7 @@
             $prev,
             timer,
             level,
-            cellClasses = ['whcell', 'blcell', 'grcell'],
+            cellClasses = ['whcell', 'blcell', 'grcell','c1'],
             fig = {
                 type: 0,
                 turn: 0,
@@ -73,6 +94,7 @@
             $level,
             $gameover,
             figoffsetx,
+			delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
 
 			// Array[figType][figTurn][col][row]
 			figs = [[
@@ -171,44 +193,10 @@
         }
 
         function setSpeed(lvl) {
-            var delay;
-
-            switch (lvl) {
-                case 0:
-                    delay = 1000;
-                    break;
-                case 1:
-                    delay = 850;
-                    break;
-                case 2:
-                    delay = 700;
-                    break;
-                case 3:
-                    delay = 750;
-                    break;
-                case 4:
-                    delay = 600;
-                    break;
-                case 5:
-                    delay = 500;
-                    break;
-                case 6:
-                    delay = 400;
-                    break;
-                case 7:
-                    delay = 250;
-                    break;
-                case 8:
-                    delay = 100;
-                    break;
-                case 9:
-                    delay = 50;
-                    break;
-            }
             if (timer) clearTimeout(timer);
             timer = setInterval(function() {
                 move(0, 1);
-            }, delay);
+            }, delaysByLevel[lvl]);
         }
 
         function onKeyDown(e) {
@@ -244,16 +232,10 @@
             removeFullLines(checkLines());
         }
 
-        function gameOver() {
-            clearTimeout(timer);
-            $(document).off('keydown');
-            $('.gameover').show();
-            $('.gameover').one('click', startNewGame);
-        }
-
         function removeFullLines(lines) {
-            var i
-            addition = 0;
+            var i,
+				e,
+				linesScores = [1, 100, 300, 700, 1500];
 
             linesCnt += lines.length;
 
@@ -262,24 +244,9 @@
 
             setSpeed(level);
 
-            switch (lines.length) {
-                case 1:
-                    addition = 100;
-                    break;
-                case 2:
-                    addition = 300;
-                    break;
-                case 3:
-                    addition = 700;
-                    break;
-                case 4:
-                    addition = 1500;
-                    break;
-            }
+            score += Math.floor(linesScores[lines.length] * 0.25 * (level + 1));
 
-            score += Math.floor(addition * 0.25 * (level + 1));
-
-            for (var e in lines) {
+            for (e in lines) {
                 for (i = 0; i < ncol; i++) {
                     stkn[i].splice(lines[e], 1);
                     stkn[i].unshift(0);
@@ -305,12 +272,6 @@
                 }
             }
             return res;
-        }
-
-        function updateScore() {
-            $score.html(score);
-            $lines.html(linesCnt);
-            $level.html(level);
         }
 
         function move(x, y) {
@@ -418,7 +379,6 @@
                         } else {
                             result[nx][ny] = figArr[i][j];
                         }
-
                     }
                 }
             }
@@ -517,17 +477,27 @@
                     $prev.append($newcell);
                 }
             }
-
             return arr;
+        }
+
+        function gameOver() {
+            clearTimeout(timer);
+            $(document).off('keydown');
+            $('.gameover').show();
+            $('.gameover').one('click', startNewGame);
+        }		
+
+        function updateScore() {
+            $score.html(score);
+            $lines.html(linesCnt);
+            $level.html(level);
         }
 
         $(document).ready(function() {
             init();
         });
     </script>
-
 </head>
-
 <body>
 	<div class="infoContainer">
 		<div class="prev"></div>
@@ -543,7 +513,5 @@
 			click to continue
 		</div>	
 	</div>
-
 </body>
-
 </html>
