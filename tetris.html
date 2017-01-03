@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>fastet v1.0beta2</title>
+    <title>fastet v1.0beta3</title>
     <style>
         .stkn {
             border: 1px solid;
@@ -9,13 +9,11 @@
 		.infoContainer {
 			position: absolute;
 			left: 300px;
-		}
-        
+		}        
         .prev {
             border: 1px solid;
             position: relative;
-        }
-        
+        }        
         .cell {
             position: absolute;
 			border: 1px solid #ddd;
@@ -43,18 +41,17 @@
 		}
 		.c7 {
 		    background-color: #f00000;
-		}		
-        
+		}		        
         .gameover {
             display: none;
-            padding: 10px;
             border: 1px blue dashed;
             border-radius: 5px;
-            margin: 10px 0;
 			position: absolute;
 			z-index: 2;
 			background: white;
 			text-align: center;
+			left: 0;
+			width: 100%;
         }
     </style>
     <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
@@ -72,9 +69,10 @@
                 type: 0,
                 turn: 0,
                 x: 0,
-                y: 0,
+                y: 0
             },
             nextFig,
+			fall = false,
             score = 0,
             linesCnt = 0,
             $score,
@@ -184,7 +182,7 @@
             if (timer) clearTimeout(timer);
             timer = setInterval(function() {
                 move(0, 1);
-            }, delaysByLevel[lvl]);
+            }, fall ? 40 : delaysByLevel[lvl]);
         }
 
         function onKeyDown(e) {
@@ -203,7 +201,8 @@
                     break;
 
                 case 32: // spacebar
-                    move(0, 1);
+					fall = true;
+					move(0, 1);
                     break;
             }
         }
@@ -268,6 +267,15 @@
 
             nextFigState.x += x;
             nextFigState.y += y;
+			
+			if (fall) {
+				nextFigState.y += 1;
+				if (getAddition(stkn, nextFigState).intersect || isOutOfBoundsY(nextFigState)) {
+					fall = false;
+				};				
+				nextFigState.y -= 1;
+				setSpeed(level);
+			}
 
             if (!checkBounds(nextFigState)) return false;
 
@@ -276,7 +284,7 @@
                 fig = nextFigState;
                 drawAllCells(unionObj.arr);
             } else {
-                if (y == 0) return false;
+				if (y == 0) return false;
                 holdThisFigAndGetNext();
             }
         }
@@ -389,7 +397,7 @@
                 type: Math.floor(Math.random() * 7),
                 turn: Math.floor(Math.random() * 4),
                 x: figoffsetx,
-                y: 0,
+                y: 0
             };
         }
 
