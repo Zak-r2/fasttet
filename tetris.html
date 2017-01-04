@@ -45,6 +45,18 @@
 		.c7 {
 		    background-color: #f00000;
 		}		        
+		.pause {
+            display: none;
+			z-index: 2;
+			background: white;
+			position: absolute;
+			opacity: 0.7;
+			filter: alpha(Opacity=70);
+			text-align: center;
+			left: 0;
+			width: 100%;
+			height: 100%;		
+		}
         .gameover {
             display: none;
             border: 1px blue dashed;
@@ -125,6 +137,7 @@
             },
             nextFig,
 			fall = false,
+			paused = false,
             score = 0,
             linesCnt = 0,
             $score,
@@ -234,13 +247,17 @@
 			showHighScoreTable(highscore);
 
             setSpeed(level);
-            $(document).keydown(onKeyDown);			
+            $(document).keydown(onKeyDown);
+			$(window).blur(function(){
+				paused = true;
+				move(0, 0);
+			});			
         }
 
         function setSpeed(lvl) {
             if (timer) clearTimeout(timer);
             timer = setInterval(function() {
-                move(0, 1);
+				if (!paused) move(0, 1);
             }, fall ? 40 : delaysByLevel[lvl]);
         }
 
@@ -258,9 +275,14 @@
                 case 40: // down
                     turn(-1);
                     break;
-                case 32: // spacebar
+                case 32: // spacebar				
 					fall = true;
 					move(0, 1);
+                    break;
+				case 27: // Esc
+                case 80: // "P"					
+					paused = !paused;
+					move(0, 0);
                     break;
             }
         }
@@ -323,6 +345,9 @@
             var nextFigState = $.extend(true, {}, fig),
                 unionObj;
 
+			$('.pause').toggle(paused);
+			if (paused) return;
+			
             nextFigState.x += x;
             nextFigState.y += y;
 			
@@ -336,6 +361,8 @@
 			}
 
             if (!checkBounds(nextFigState)) return false;
+			
+			
 
             unionObj = getAddition(stkn, nextFigState);
             if (!unionObj.intersect) {
@@ -350,7 +377,9 @@
         function turn(a) {
             var nextFigState = $.extend(true, {}, fig),
                 unionObj;
-
+			
+			if (paused) return;
+			
             nextFigState.turn += a;
             if (nextFigState.turn > 3) nextFigState.turn = 0;
             if (nextFigState.turn < 0) nextFigState.turn = 3;
@@ -549,22 +578,25 @@
 				lines : linesCnt, 
 				level : level
 			};
+			
+			$('.resultContainer').hide();
+			
 			if (result.name) {
-		    $.post("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey, result)
-				.done(function(data) {
-					loadHighScoreTable(data._id);
-				})
-				.fail(function() {
-					alert( "Error saveing your result" );
-					showHighScoreTable(highscore);
-				})
-				.always(function() {
-					$('.resultContainer').hide();
-					highscore.push(result);
-					$startButton.show();
-				});				
+				$.post("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey, result)
+					.done(function(data) {
+						loadHighScoreTable(data._id);
+					})
+					.fail(function() {
+						alert( "Error saveing your result" );
+						showHighScoreTable(highscore);
+					})
+					.always(function() {
+						
+						highscore.push(result);
+						$startButton.show();
+					});				
 			} else {
-				$('.resultContainer').hide();
+
 				$startButton.show();			
 			}
 		}
@@ -595,7 +627,7 @@
 			
 			$list.html("<li class=\"title\"><i>#</i><b>Player</b><span class='scoreVal'>score</span><span>lines</span><span>level</span></li>");
 			for (i in results) {
-				if (i > 10) break;
+				if (i > 9) break;
 				
 				itm = results[i];
 				
@@ -614,6 +646,13 @@
 		$(document).ready(function() {
             init();
         });		
+		
+		/*
+			v1.0 TODO			
+		
+			Bugs:
+			* Fig sometimes appear on second row, could be firs		
+		*/
 	}(jQuery));
     </script>
 </head>
@@ -642,6 +681,10 @@
 				<button class="save">Save</button>			
 			</div>
 		</div>	
+		<div class="pause">
+			<h3>Pause</h3>			
+			<div>press ESC or P to continue</div>
+		</div>			
 	</div>
 </body>
 </html>
