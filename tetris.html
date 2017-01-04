@@ -1,7 +1,10 @@
 <html>
 <head>
-    <title>fastet v1.0beta3</title>
+    <title>FasTet v1.0</title>
     <style>
+		body, html, h3, div, span, input, button {
+			font-family: arial,sans-serif;
+		}	
         .stkn {
             border: 1px solid;
             position: relative;
@@ -52,11 +55,59 @@
 			text-align: center;
 			left: 0;
 			width: 100%;
+			height: 100%;
         }
+		.highScoreTable {
+			padding-top: 30px;
+		}
+		.highScoreTable div{
+			text-align: right;
+			font-size: 20px;		
+		}
+		.highScoreTable ul {
+			list-style-type: none;
+			padding: 0;
+		}
+		.highScoreTable li.marked {
+			color: red;
+			font-size: 125%;
+		}
+		.highScoreTable li.title {
+			color: #99f;
+			border-bottom: solid 1px;
+			padding-bottom: 2px;
+			margin-bottom: 5px;
+		}
+		.highScoreTable .scoreVal {
+			width: 70px;
+		}
+		.highScoreTable b {
+		    width: 150px;
+			display: inline-block;		
+		}
+		.highScoreTable i {
+		    width: 40px;
+			color: #99f;
+			font-style: normal; 
+			display: inline-block;		
+			text-align: center;
+		}		
+		.highScoreTable span {
+		    width: 50px;
+			display: inline-block;
+		}
+		.userName {
+		    width: 115px;
+		}
+		.startButton {
+			font-size: 32px;
+			padding: 10px 20px;		
+		}
     </style>
     <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
     <script>
 	(function ($) { 
+
         var ncol = 10,
             nrow = 20,
             stkn = [],
@@ -80,9 +131,12 @@
             $lines,
             $level,
             $gameover,
+			$startButton,
             figoffsetx,
 			delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
-
+			highscore = [],
+			storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
+            storageCollection = "fasttetres",
 			// Array[figType][figTurn][col][row]
 			figs = [[
 					[[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],  // fig l
@@ -152,6 +206,7 @@
             $prev = $('.prev');
             $lines = $('.lines');
             $level = $('.level');
+			$startButton = $('.startButton');			
 
             $prev.width(size * 4);
             $prev.height(size * 4);
@@ -161,11 +216,13 @@
 
             figoffsetx = Math.floor(ncol / 2) - 2;
 
-            startNewGame();
+			loadHighScoreTable();
+			$startButton.on('click', startNewGame);		
         }
 
         function startNewGame() {
             $gameover.hide();
+            $startButton.hide();
             score = 0;
             linesCnt = 0;
             level = 0;
@@ -174,9 +231,10 @@
 
             drawAllCells(getAddition(stkn, fig).arr);
             updateScore();
+			showHighScoreTable(highscore);
 
             setSpeed(level);
-            $(document).keydown(onKeyDown);
+            $(document).keydown(onKeyDown);			
         }
 
         function setSpeed(lvl) {
@@ -480,14 +538,78 @@
             clearTimeout(timer);
             $(document).off('keydown');
             $('.gameover').show();
-            $('.gameover').one('click', startNewGame);
+            $('.resultContainer').show();
+            $('.save').one('click', saveResult);
         }		
 
+        function saveResult() {
+			var result = {
+				name  :  $('.userName').val(), 
+				score : score, 
+				lines : linesCnt, 
+				level : level
+			};
+			if (result.name) {
+		    $.post("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey, result)
+				.done(function(data) {
+					loadHighScoreTable(data._id);
+				})
+				.fail(function() {
+					alert( "Error saveing your result" );
+					showHighScoreTable(highscore);
+				})
+				.always(function() {
+					$('.resultContainer').hide();
+					highscore.push(result);
+					$startButton.show();
+				});				
+			} else {
+				$('.resultContainer').hide();
+				$startButton.show();			
+			}
+		}
+		
         function updateScore() {
             $score.html(score);
             $lines.html(linesCnt);
             $level.html(level);
         }
+		
+		function loadHighScoreTable(highLightId) {
+			$.get("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey)
+				.done(function(data) {
+					highscore = data;
+					showHighScoreTable(highscore, highLightId);
+				});
+        		
+		}
+		
+		function showHighScoreTable(hscore, highLightId) {
+			var i,
+				itm,
+				$list = $('.highScoreTable ul'),
+				highLight,
+				results = hscore.sort(function (a, b) {
+					return b.score - a.score;
+				});
+			
+			$list.html("<li class=\"title\"><i>#</i><b>Player</b><span class='scoreVal'>score</span><span>lines</span><span>level</span></li>");
+			for (i in results) {
+				if (i > 10) break;
+				
+				itm = results[i];
+				
+				highLight = itm._id && itm._id == highLightId ? 'marked' : '';
+
+				$item = $("<li class='" + highLight + "'><i>" 
+									+ (i - 0 + 1) + "</i><b>" 
+									+ itm.name + "</b><span class='scoreVal'>" 
+									+ itm.score + "</span><span>" 
+									+ itm.lines + "</span><span>" 
+									+ itm.level + "</span></li>");
+				$list.append($item);			
+			}			
+		}
 		
 		$(document).ready(function() {
             init();
@@ -498,18 +620,27 @@
 <body>
 	<div class="infoContainer">
 		<div class="prev"></div>
-		<span class="score_container">
+		<div class="score_container">
 			Score: <span class="score"></span> 
 			Lines: <span class="lines"></span> 
 			Level: <span class="level"></span>
-		</span>
+		</div>
+		<div class="highScoreTable">
+			<div>High score</div>
+			<ul></ul>
+		</div>
+		
+		<button class="startButton">Start</button>
 	</div>
     <div class="stkn">
 		<div class="gameover">
 			<h3>Gameover</h3>
-			click to continue
-			<!--<input type="text" class="UserName">-->
-			<br>
+			<div class="resultContainer">
+				Your score:<span class="score"></span>
+				<br><p>
+				Name <input type="text" class="userName"> 
+				<button class="save">Save</button>			
+			</div>
 		</div>	
 	</div>
 </body>
