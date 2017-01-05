@@ -565,11 +565,11 @@
 
         function gameOver() {
             clearTimeout(timer);
-            $(document).off('keydown');
-			$('.userName').focus(); 
+            $(document).off('keydown');			
             $('.gameover').show();
             $('.resultContainer').show();
             $('.save').one('click', saveResult);
+			$('.userName').get(0).focus(); 
         }		
 
         function saveResult() {
