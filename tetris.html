@@ -62,12 +62,12 @@
             border: 1px blue dashed;
             border-radius: 5px;
 			position: absolute;
-			z-index: 2;
+			z-index: 3;
 			background: white;
 			text-align: center;
 			left: 0;
 			width: 100%;
-			height: 100%;
+			height: 100%;			
         }
 		.highScoreTable {
 			padding-top: 30px;
@@ -566,6 +566,7 @@
         function gameOver() {
             clearTimeout(timer);
             $(document).off('keydown');
+			$('.userName').focus(); 
             $('.gameover').show();
             $('.resultContainer').show();
             $('.save').one('click', saveResult);
