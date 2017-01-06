@@ -617,7 +617,7 @@
 					.always(function() {
 						highscore.push(result);
 						$startButton.show();
-						localPlayersList.push(username)
+						localPlayersList.push(username);
 						localStorage.setItem('usernames',  $.unique(localPlayersList).join(';'));						
 					});				
 			} else {
@@ -669,21 +669,19 @@
 		
 		function getLoacalPlayers() {
 			if (localStorage && localStorage.getItem('usernames')) {
-				var st = localStorage.getItem('usernames');
-				if (st.indexOf(';') > -1) {
-					return st.split(';')
-				}
+				return localStorage.getItem('usernames').split(';')
 			}
 			return [];
 		}
 				
 		function loadLoacalPlayers() {					
-			var $players = $('.players');
+			var fakeOpts = '<option disabled selected></option>', 
+				$players = $('.players');
 		
 			localPlayersList = getLoacalPlayers();
 			
 			if (localPlayersList.length) {
-				$players.html('');
+				$players.html(localPlayersList.length == 1 ? fakeOpts : '');
 				$.each(localPlayersList, function(key, value) {   
 					$players
 					 .append($("<option></option>")
