@@ -197,17 +197,17 @@
 
 					[[0,0,0,0],[0,0,3,3],[0,3,3,0],[0,0,0,0]]  
 				   ],[
-					[[0,4,4,0],[0,4,4,0],[0,0,0,0],[0,0,0,0]], // fig o
+					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]], // fig o
 					
-					[[0,4,4,0],[0,4,4,0],[0,0,0,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]],  
 
-					[[0,4,4,0],[0,4,4,0],[0,0,0,0],[0,0,0,0]],
+					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]],
 
-					[[0,4,4,0],[0,4,4,0],[0,0,0,0],[0,0,0,0]]  
+					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]]  
 				   ],[
 					[[0,5,0,0],[0,5,0,0],[0,5,5,0],[0,0,0,0]], // fig L
 					
-					[[0,0,0,0],[5,5,5,0],[5,0,0,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,5,5,5],[0,5,0,0],[0,0,0,0]],  
 
 					[[0,0,0,0],[0,5,5,0],[0,0,5,0],[0,0,5,0]],  
 
@@ -215,7 +215,7 @@
 				   ],[
 					[[0,0,6,0],[0,0,6,0],[0,6,6,0],[0,0,0,0]], // fig J
 					
-					[[0,0,0,0],[6,0,0,0],[6,6,6,0],[0,0,0,0]],  
+					[[0,0,0,0],[0,6,0,0],[0,6,6,6],[0,0,0,0]],  
 
 					[[0,0,0,0],[0,6,6,0],[0,6,0,0],[0,6,0,0]],  
 
@@ -228,8 +228,16 @@
 					[[0,0,0,0],[0,7,0,0],[7,7,7,0],[0,0,0,0]],  
 
 					[[7,0,0,0],[7,7,0,0],[7,0,0,0],[0,0,0,0]]  
-				   ]
-				   
+				   ]				   
+				 ],
+				 figsOffsetY =  [
+					[-2, 0,-1, 0], 
+					[-1,-1,-1,-1],
+					[-1,-1,-1,-1],
+					[-1,-1,-1,-1],
+					[-1,-1,-1, 0],
+					[-1,-1,-1, 0],
+					[ 0,-1, 0, 0],
 				 ];
 
 
@@ -502,11 +510,14 @@
         }
 
         function makeFig() {
-            return {
-                type: Math.floor(Math.random() * 7),
-                turn: Math.floor(Math.random() * 4),
+			var ty = 2,//Math.floor(Math.random() * 7),
+				tu = 0;//Math.floor(Math.random() * 4);
+
+			return {
+                type: ty,
+                turn: tu,
                 x: figoffsetx,
-                y: 0
+                y: figsOffsetY[ty][tu]
             };
         }
 
@@ -611,7 +622,7 @@
 						loadHighScoreTable(data._id);
 					})
 					.fail(function() {
-						alert( "Error saveing your result" );
+						alert( "There was an error saving your result" );
 						showHighScoreTable(highscore);
 					})
 					.always(function() {
@@ -675,13 +686,12 @@
 		}
 				
 		function loadLoacalPlayers() {					
-			var fakeOpts = '<option disabled selected></option>', 
-				$players = $('.players');
+			var $players = $('.players');
 		
 			localPlayersList = getLoacalPlayers();
 			
 			if (localPlayersList.length) {
-				$players.html(localPlayersList.length == 1 ? fakeOpts : '');
+				$players.html('');
 				$.each(localPlayersList, function(key, value) {   
 					$players
 					 .append($("<option></option>")
@@ -690,8 +700,8 @@
 				});		
 				$players
 					.show()
-					.off('change')
-					.on('change', function(e){
+					.off('click')
+					.on('click', function(e){
 						$('.userName').val($(e.target).val());					
 					})
 			}
@@ -700,13 +710,7 @@
 		$(document).ready(function() {
             init();
         });		
-		
-		/*
-			v1.0 TODO			
-		
-			Bugs:
-			* Fig sometimes appear on second row, could be firs		
-		*/
+
 	}(jQuery));
     </script>
 </head>
