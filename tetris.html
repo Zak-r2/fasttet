@@ -154,21 +154,12 @@
             timer,
             level,
             cellClasses = ['whcell', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
-            fig = {
-                type: 0,
-                turn: 0,
-                x: 0,
-                y: 0
-            },
+            fig,
             nextFig,
 			fall = false,
 			paused = false,
             score = 0,
             linesCnt = 0,
-            $score,
-            $lines,
-            $level,
-            $gameover,
 			$startButton,
             figoffsetx,
 			delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
@@ -227,12 +218,8 @@
 
 
         function init() {
-            $stkn = $('.stkn');
-            $score = $('.score');
-            $gameover = $('.gameover');
+            $stkn = $('.stkn');            
             $prev = $('.prev');
-            $lines = $('.lines');
-            $level = $('.level');
 			$startButton = $('.startButton');			
 
             $prev.width(size * 4);
@@ -242,13 +229,15 @@
             $stkn.height(size * nrow);
 
             figoffsetx = Math.floor(ncol / 2) - 2;
+			
+			stkn = prepareAllCells($stkn, $prev);
 
 			loadHighScoreTable();
 			$startButton.on('click', startNewGame);		
         }
 
         function startNewGame() {
-            $gameover.hide();
+            $('.gameover').hide();
             $startButton.hide();
             score = 0;
             linesCnt = 0;
@@ -314,23 +303,25 @@
 			drawAllCells(getAddition(stkn, fig).arr);
         }
 
-        function removeLines(lines) {
+        function removeLines(fullRowIndexes) {
             var i,
 				e,
 				linesScores = [1, 100, 300, 700, 1500];
 
-            linesCnt += lines.length;
+			if (!fullRowIndexes || fullRowIndexes.length < 1) return;
+			
+            linesCnt += fullRowIndexes.length;
 
             level = Math.floor(linesCnt / 10);
             if (level > 9) level = 9;
 
             setSpeed(level);
 
-            score += Math.floor(linesScores[lines.length] * 0.25 * (level + 1));
+            score += Math.floor(linesScores[fullRowIndexes.length] * 0.25 * (level + 1));
 
-            for (e in lines) {
+            for (row in fullRowIndexes) {
                 for (i = 0; i < ncol; i++) {
-                    stkn[i].splice(lines[e], 1);
+                    stkn[i].splice(fullRowIndexes[row], 1);
                     stkn[i].unshift(0);
                 }
             }
@@ -386,13 +377,13 @@
             }
         }
 
-        function turn(a) {
+        function turn(direction) {
             var nextFigState = $.extend(true, {}, fig),
                 unionObj;
 			
 			if (paused) return;
 			
-            nextFigState.turn += a;
+            nextFigState.turn += direction;
             if (nextFigState.turn > 3) nextFigState.turn = 0;
             if (nextFigState.turn < 0) nextFigState.turn = 3;
 
@@ -407,11 +398,11 @@
             }
         }
 
-        function checkBounds(nextFigState) {
-            if (isOutOfBoundsX(nextFigState)) {
+        function checkBounds(figObj) {
+            if (isOutOfBoundsX(figObj)) {
                 return false;
             }
-            if (isOutOfBoundsY(nextFigState)) {
+            if (isOutOfBoundsY(figObj)) {
                 holdThisFigAndGetNext();
                 return false;
             }
@@ -509,7 +500,7 @@
 
             for (i = 0; i < 4; i++) {
                 for (j = 0; j < 4; j++) {
-                    updateCellColor(i, j, fig[i] && fig[i][j] ? fig[i][j] : 0, '.prevcell');
+                    updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, '.prevcell');
                 }
             }
         }
@@ -541,7 +532,7 @@
                 arr[i] = [];
                 for (j = 0; j < nrow; j++) {
                     arr[i][j] = 0;
-                    var cls = 'cell' + i + '-' + j + ' cell',
+                    var cls = 'cell' + i + '-' + j + ' cell ' + cellClasses[0],
                         $newcell = $("<div class='" + cls + "'></div>"),
                         l = i * size,
                         t = j * size;
@@ -559,7 +550,7 @@
 
             for (i = 0; i < 4; i++) {
                 for (j = 0; j < 4; j++) {
-                    var cls = 'prevcell' + i + '-' + j + ' cell',
+                    var cls = 'prevcell' + i + '-' + j + ' cell ' + cellClasses[0],
                         $newcell = $("<div class='" + cls + "'></div>"),
                         l = i * size,
                         t = j * size;
@@ -581,12 +572,17 @@
             clearTimeout(timer);
             $(document).off('keydown');			
             $('.gameover').show();
-            $('.resultContainer').show();
-            $('.save').one('click', saveResult);
-			$('.userName').get(0).focus(); 
+			if (linesCnt > 0) {
+				$('.resultContainer').show();
+				$('.save').one('click', saveResultClick);
+				$('.userName').get(0).focus(); 
+			} else {
+				$('.resultContainer').hide();
+				$startButton.show();
+			}
         }		
 
-        function saveResult() {
+        function saveResultClick() {
 			var username = $('.userName').val(),
 				result = {
 					name  : username, 
@@ -613,14 +609,14 @@
 						localStorage.setItem('usernames',  $.unique(localPlayersList).join(';'));						
 					});				
 			} else {
-				$startButton.show();			
+				$startButton.show();
 			}
 		}
 		
         function updateScore() {
-            $score.html(score);
-            $lines.html(linesCnt);
-            $level.html(level);
+            $('.score').html(score);
+            $('.lines').html(linesCnt);
+            $('.level').html(level);
         }
 		
 		function loadHighScoreTable(highLightId) {
@@ -728,8 +724,8 @@
 		</div>
 		<div class="highScoreTable">
 			<div>High score
-				<a href="#" class="hsl">&#9665;</a>
-				<a href="#" class="hsr">&#9655;</a>
+				<a href="#" class="hsl">&uarr;</a>
+				<a href="#" class="hsr">&darr;</a>
 			</div>
 			<ul>
 				<li>Loading... &#9203;</li>
