@@ -73,6 +73,10 @@
 		.highScoreTable {
 			padding-top: 30px;
 		}
+		.highScoreTable a{
+			text-decoration: none;
+			font-size: 18px;
+		}
 		.highScoreTable div{
 			text-align: right;
 			font-size: 20px;		
@@ -169,6 +173,7 @@
             figoffsetx,
 			delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
 			highscore = [],
+			highscorePage = 0,
 			storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
             storageCollection = "fasttetres",
 			localPlayersList = [],
@@ -629,29 +634,52 @@
 		
 		function showHighScoreTable(hscore, highLightId) {
 			var i,
+				j,
 				itm,
 				$list = $('.highScoreTable ul'),
 				highLight,
-				results = hscore.sort(function (a, b) {
+				nday = 365,
+				now = new Date(),
+				arr = $.grep(hscore, function(item) {
+					var dtDays = (now -  new Date(item.created_at)) / (3600 * 24 * 1000);
+					return dtDays < nday
+				}),
+				results = arr.sort(function (a, b) {
 					return b.score - a.score;
 				});
 			
 			$list.html("<li class=\"title\"><i>#</i><b>Player</b><span class='scoreVal'>score</span><span>lines</span><span>level</span></li>");
-			for (i in results) {
-				if (i > 9) break;
+			for (i = 0; i < 10; i++) {
+				j = highscorePage * 10 + i;
+				if (j > results.length - 1) break;
 				
-				itm = results[i];
+				itm = results[j];
 				
 				highLight = itm._id && itm._id == highLightId ? 'marked' : '';
 
-				$item = $("<li class='" + highLight + "'><i>" 
-									+ (i - 0 + 1) + "</i><b>" 
+				$item = $("<li class='" + highLight + "' title='" 
+									+ new Date(itm.created_at) + "'><i>" 
+									+ (j - 0 + 1) + "</i><b>" 
 									+ itm.name + "</b><span class='scoreVal'>" 
 									+ itm.score + "</span><span>" 
 									+ itm.lines + "</span><span>" 
 									+ itm.level + "</span></li>");
 				$list.append($item);			
-			}			
+			}		
+			$('.hsl').off().on('click', function(e) {
+				e.preventDefault();
+				if (highscorePage > 0) {
+					highscorePage--;
+					showHighScoreTable(hscore, highLightId);
+				}
+			});
+			$('.hsr').off().on('click', function(e) {
+				e.preventDefault();
+				if (highscorePage < ((results.length - 1) / 10) - 1) {
+					highscorePage++;
+					showHighScoreTable(hscore, highLightId);
+				}
+			});
 		}
 		
 		function getLoacalPlayers() {
@@ -699,8 +727,13 @@
 			Level: <span class="level"></span>
 		</div>
 		<div class="highScoreTable">
-			<div>High score</div>
-			<ul></ul>
+			<div>High score
+				<a href="#" class="hsl">&#9665;</a>
+				<a href="#" class="hsr">&#9655;</a>
+			</div>
+			<ul>
+				<li>Loading... &#9203;</li>
+			</ul>
 		</div>
 		
 		<button class="startButton">Start</button>
