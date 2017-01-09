@@ -3,755 +3,785 @@
 <head>
     <title>FastTet v1.0</title>
     <style>
-		body, html, h3, div, span, input, button {
-			font-family: arial,sans-serif;
-		}	
+        body, html, h3, div, span, input, button {
+            font-family: arial, sans-serif;
+        }
+
         .stkn {
             border: 1px solid;
             position: relative;
         }
-		.infoContainer {
-			position: absolute;
-			left: 300px;
-		}        
+
+        .infoContainer {
+            position: absolute;
+            left: 300px;
+        }
+
         .prev {
             border: 1px solid;
             position: relative;
-        }        
+        }
+
         .cell {
             position: absolute;
-			border: 1px solid #ddd;
-        }        
+            border: 1px solid #ddd;
+        }
+
         .whcell {
             background-color: white;
-        }	
-		.c1 {
-		    background-color: #00f0f0;
-		}
-		.c2 {
-		    background-color: #0000f0;
-		}
-		.c3 {
-		    background-color: #f0a000;
-		}
-		.c4 {
-		    background-color: #f0f000;
-		}
-		.c5 {
-		    background-color: #00f000;
-		}
-		.c6 {
-		    background-color: #a000f0;
-		}
-		.c7 {
-		    background-color: #f00000;
-		}		        
-		.pause {
+        }
+
+        .c1 {
+            background-color: #00f0f0;
+        }
+
+        .c2 {
+            background-color: #0000f0;
+        }
+
+        .c3 {
+            background-color: #f0a000;
+        }
+
+        .c4 {
+            background-color: #f0f000;
+        }
+
+        .c5 {
+            background-color: #00f000;
+        }
+
+        .c6 {
+            background-color: #a000f0;
+        }
+
+        .c7 {
+            background-color: #f00000;
+        }
+
+        .pause {
             display: none;
-			z-index: 2;
-			background: white;
-			position: absolute;
-			opacity: 0.7;
-			filter: alpha(Opacity=70);
-			text-align: center;
-			left: 0;
-			width: 100%;
-			height: 100%;		
-		}
+            z-index: 2;
+            background: white;
+            position: absolute;
+            opacity: 0.7;
+            filter: alpha(Opacity=70);
+            text-align: center;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         .gameover {
             display: none;
             border: 1px blue dashed;
             border-radius: 5px;
-			position: absolute;
-			z-index: 3;
-			background: white;
-			text-align: center;
-			left: 0;
-			width: 100%;
-			height: 100%;			
+            position: absolute;
+            z-index: 3;
+            background: white;
+            text-align: center;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
-		.highScoreTable {
-			padding-top: 30px;
-		}
-		.highScoreTable a{
-			text-decoration: none;
-			font-size: 18px;
-		}
-		.highScoreTable div{
-			text-align: right;
-			font-size: 20px;		
-		}
-		.highScoreTable ul {
-			list-style-type: none;
-			padding: 0;
-		}
-		.highScoreTable li.marked {
-			color: red;
-			font-size: 125%;
-		}
-		.highScoreTable li.title {
-			color: #99f;
-			border-bottom: solid 1px;
-			padding-bottom: 2px;
-			margin-bottom: 5px;
-		}
-		.highScoreTable .scoreVal {
-			width: 70px;
-		}
-		.highScoreTable b {
-		    width: 150px;
-			display: inline-block;		
-		}
-		.highScoreTable i {
-		    width: 40px;
-			color: #99f;
-			font-style: normal; 
-			display: inline-block;		
-			text-align: center;
-		}		
-		.highScoreTable span {
-		    width: 50px;
-			display: inline-block;
-		}
-		.userNameContainer {
-			position: relative;
-			width: 120px;
-			height: 22px;
-			display: inline-block;
-			top: 6px;
-		}
-		.userNameContainer .userName {
-			width: 98px;
-			height: 16px;
-			position: absolute;
-			left: 0px;
-			z-index: 5;
-		}
-		.userNameContainer .players {
-			width: 100%;
-			height: 100%;
-			position: absolute;
-			right: 0px;
-			z-index: 3;
-			display: none;
-		}		
-		
-		.startButton {
-			font-size: 32px;
-			padding: 10px 20px;		
-		}
+
+        .highScoreTable {
+            padding-top: 30px;
+        }
+
+        .highScoreTable a {
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .highScoreTable div {
+            text-align: right;
+            font-size: 20px;
+        }
+
+        .highScoreTable ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .highScoreTable li.marked {
+            color: red;
+            font-size: 125%;
+        }
+
+        .highScoreTable li.title {
+            color: #99f;
+            border-bottom: solid 1px;
+            padding-bottom: 2px;
+            margin-bottom: 5px;
+        }
+
+        .highScoreTable .scoreVal {
+            width: 70px;
+        }
+
+        .highScoreTable b {
+            width: 150px;
+            display: inline-block;
+        }
+
+        .highScoreTable i {
+            width: 40px;
+            color: #99f;
+            font-style: normal;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .highScoreTable span {
+            width: 50px;
+            display: inline-block;
+        }
+
+        .userNameContainer {
+            position: relative;
+            width: 120px;
+            height: 22px;
+            display: inline-block;
+            top: 6px;
+        }
+
+        .userNameContainer .userName {
+            width: 98px;
+            height: 16px;
+            position: absolute;
+            left: 0;
+            z-index: 5;
+        }
+
+        .userNameContainer .players {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            z-index: 3;
+            display: none;
+        }
+
+        .startButton {
+            font-size: 32px;
+            padding: 10px 20px;
+        }
     </style>
     <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
     <script>
-	(function ($) { 
+        (function ($) {
 
-        var ncol = 10,
-            nrow = 20,
-            stkn = [],
-            size = 25,
-            $stkn,
-            $prev,
-            timer,
-            level,
-            cellClasses = ['whcell', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
-            fig,
-            nextFig,
-			fall = false,
-			paused = false,
-            score = 0,
-            linesCnt = 0,
-			$startButton,
-            figoffsetx,
-			delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
-			highscore = [],
-			highscorePage = 0,
-			storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
-            storageCollection = "fasttetres",
-			localPlayersList = [],
-			// Array[figType][figTurn][col][row] value = color number
-			figs = [[
-					[[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],  // fig l
-					[[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],  
-					[[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],  
-					[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]  
-				   ],[
-					[[0,0,2,0],[0,2,2,0],[0,2,0,0],[0,0,0,0]], // fig z				
-					[[0,0,0,0],[0,2,2,0],[0,0,2,2],[0,0,0,0]],  
-					[[0,0,2,0],[0,2,2,0],[0,2,0,0],[0,0,0,0]],  
-					[[0,0,0,0],[0,2,2,0],[0,0,2,2],[0,0,0,0]]  
-				   ],[
-					[[0,3,0,0],[0,3,3,0],[0,0,3,0],[0,0,0,0]], // fig s					
-					[[0,0,0,0],[0,0,3,3],[0,3,3,0],[0,0,0,0]],  
-					[[0,3,0,0],[0,3,3,0],[0,0,3,0],[0,0,0,0]],  
-					[[0,0,0,0],[0,0,3,3],[0,3,3,0],[0,0,0,0]]  
-				   ],[
-					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]], // fig o					
-					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]],  
-					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]],
-					[[0,0,0,0],[0,4,4,0],[0,4,4,0],[0,0,0,0]]  
-				   ],[
-					[[0,5,0,0],[0,5,0,0],[0,5,5,0],[0,0,0,0]], // fig L					
-					[[0,0,0,0],[0,5,5,5],[0,5,0,0],[0,0,0,0]],  
-					[[0,0,0,0],[0,5,5,0],[0,0,5,0],[0,0,5,0]],  
-					[[0,0,0,0],[0,0,5,0],[5,5,5,0],[0,0,0,0]]  
-				   ],[
-					[[0,0,6,0],[0,0,6,0],[0,6,6,0],[0,0,0,0]], // fig J					
-					[[0,0,0,0],[0,6,0,0],[0,6,6,6],[0,0,0,0]],  
-					[[0,0,0,0],[0,6,6,0],[0,6,0,0],[0,6,0,0]],  
-					[[0,0,0,0],[6,6,6,0],[0,0,6,0],[0,0,0,0]]  
-				   ],[
-					[[0,0,0,0],[7,7,7,0],[0,7,0,0],[0,0,0,0]], // fig T					
-					[[0,7,0,0],[7,7,0,0],[0,7,0,0],[0,0,0,0]],  
-					[[0,7,0,0],[7,7,7,0],[0,0,0,0],[0,0,0,0]],  
-					[[0,7,0,0],[0,7,7,0],[0,7,0,0],[0,0,0,0]]  
-				   ]				   
-				 ],
-				 figsOffsetY =  [
-					[-2, 0,-1, 0], 
-					[-1,-1,-1,-1],
-					[-1,-1,-1,-1],
-					[-1,-1,-1,-1],
-					[-1,-1,-1, 0],
-					[-1,-1,-1, 0],
-					[ 0,-1, 0, 0],
-				 ];
+            var ncol = 10,
+                nrow = 20,
+                stkn = [],
+                size = 25,
+                $stkn,
+                $prev,
+                timer,
+                level,
+                cellClasses = ['whcell', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
+                fig,
+                nextFig,
+                fall = false,
+                paused = false,
+                score = 0,
+                linesCnt = 0,
+                $startButton,
+                figoffsetx,
+                delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
+                highscore = [],
+                highscorePage = 0,
+                storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
+                storageCollection = "fasttetres",
+                localPlayersList = [],
+                // Array[figType][figTurn][col][row] value = color number
+                figs = [[
+                    [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],  // fig l
+                    [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]],
+                    [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
+                    [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]], // fig z				
+                    [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]],
+                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]]
+                ], [
+                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]], // fig s					
+                    [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]],
+                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]], // fig o					
+                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 5, 0, 0], [0, 5, 0, 0], [0, 5, 5, 0], [0, 0, 0, 0]], // fig L					
+                    [[0, 0, 0, 0], [0, 5, 5, 5], [0, 5, 0, 0], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 5, 5, 0], [0, 0, 5, 0], [0, 0, 5, 0]],
+                    [[0, 0, 0, 0], [0, 0, 5, 0], [5, 5, 5, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 0, 6, 0], [0, 0, 6, 0], [0, 6, 6, 0], [0, 0, 0, 0]], // fig J					
+                    [[0, 0, 0, 0], [0, 6, 0, 0], [0, 6, 6, 6], [0, 0, 0, 0]],
+                    [[0, 0, 0, 0], [0, 6, 6, 0], [0, 6, 0, 0], [0, 6, 0, 0]],
+                    [[0, 0, 0, 0], [6, 6, 6, 0], [0, 0, 6, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 0, 0, 0], [7, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]], // fig T					
+                    [[0, 7, 0, 0], [7, 7, 0, 0], [0, 7, 0, 0], [0, 0, 0, 0]],
+                    [[0, 7, 0, 0], [7, 7, 7, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+                    [[0, 7, 0, 0], [0, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]]
+                ]
+                ],
+                figsOffsetY = [
+                    [-2, 0, -1, 0],
+                    [-1, -1, -1, -1],
+                    [-1, -1, -1, -1],
+                    [-1, -1, -1, -1],
+                    [-1, -1, -1, 0],
+                    [-1, -1, -1, 0],
+                    [0, -1, 0, 0]
+                ];
 
 
-        function init() {
-            $stkn = $('.stkn');            
-            $prev = $('.prev');
-			$startButton = $('.startButton');			
+            function init() {
+                $stkn = $('.stkn');
+                $prev = $('.prev');
+                $startButton = $('.startButton');
 
-            $prev.width(size * 4);
-            $prev.height(size * 4);
+                $prev.width(size * 4);
+                $prev.height(size * 4);
 
-            $stkn.width(size * ncol);
-            $stkn.height(size * nrow);
+                $stkn.width(size * ncol);
+                $stkn.height(size * nrow);
 
-            figoffsetx = Math.floor(ncol / 2) - 2;
-			
-			stkn = prepareAllCells($stkn, $prev);
+                figoffsetx = Math.floor(ncol / 2) - 2;
 
-			loadHighScoreTable();
-			$startButton.on('click', startNewGame);		
-        }
+                stkn = prepareAllCells($stkn, $prev);
 
-        function startNewGame() {
-            $('.gameover').hide();
-            $startButton.hide();
-            score = 0;
-            linesCnt = 0;
-            level = 0;
-            stkn = prepareAllCells($stkn, $prev);
-            fig = getNewFig();
-
-            drawAllCells(getAddition(stkn, fig).arr);
-            updateScore();
-			showHighScoreTable(highscore);
-			loadLoacalPlayers();
-
-            setSpeed(level);
-            $(document).keydown(onKeyDown);
-			$(window).blur(function(){
-				paused = true;
-				move(0, 0);
-			});			
-        }
-
-        function setSpeed(lvl) {
-            if (timer) clearTimeout(timer);
-            timer = setInterval(function() {
-				if (!paused) move(0, 1);
-            }, fall ? 40 : delaysByLevel[lvl]);
-        }
-
-        function onKeyDown(e) {
-            switch (e.keyCode) {
-                case 37: // left
-                    move(-1, 0);
-                    break;
-                case 39: // right
-                    move(1, 0);
-                    break;
-                case 38: // up
-                    turn(1);
-                    break;
-                case 40: // down
-                    turn(-1);
-                    break;
-                case 32: // spacebar				
-					fall = true;
-					move(0, 1);
-                    break;
-				case 27: // Esc
-                case 80: // "P"					
-					paused = !paused;
-					move(0, 0);
-                    break;
+                loadHighScoreTable();
+                $startButton.on('click', startNewGame);
             }
-        }
 
-        function holdThisFigAndGetNext() {
-            stkn = getAddition(stkn, fig).arr;
-            fig = getNewFig();
+            function startNewGame() {
+                $('.gameover').hide();
+                $startButton.hide();
+                score = 0;
+                linesCnt = 0;
+                level = 0;
+                stkn = prepareAllCells($stkn, $prev);
+                fig = getNewFig();
 
-            if (getAddition(stkn, fig).intersect) {
-                gameOver();
-                return;
-            }            
-            removeLines(getFullLinesArray(stkn));
-			drawAllCells(getAddition(stkn, fig).arr);
-        }
+                drawAllCells(getAddition(stkn, fig).arr);
+                updateScore();
+                showHighScoreTable(highscore);
+                loadLoacalPlayers();
 
-        function removeLines(fullRowIndexes) {
-            var i,
-				e,
-				linesScores = [1, 100, 300, 700, 1500];
+                setSpeed(level);
+                $(document).keydown(onKeyDown);
+                $(window).blur(function () {
+                    paused = true;
+                    move(0, 0);
+                });
+            }
 
-			if (!fullRowIndexes || fullRowIndexes.length < 1) return;
-			
-            linesCnt += fullRowIndexes.length;
+            function setSpeed(lvl) {
+                if (timer) clearTimeout(timer);
+                timer = setInterval(function () {
+                    if (!paused) move(0, 1);
+                }, fall ? 40 : delaysByLevel[lvl]);
+            }
 
-            level = Math.floor(linesCnt / 10);
-            if (level > 9) level = 9;
-
-            setSpeed(level);
-
-            score += Math.floor(linesScores[fullRowIndexes.length] * 0.25 * (level + 1));
-
-            for (row in fullRowIndexes) {
-                for (i = 0; i < ncol; i++) {
-                    stkn[i].splice(fullRowIndexes[row], 1);
-                    stkn[i].unshift(0);
+            function onKeyDown(e) {
+                switch (e.keyCode) {
+                    case 37: // left
+                        move(-1, 0);
+                        break;
+                    case 39: // right
+                        move(1, 0);
+                        break;
+                    case 38: // up
+                        turn(1);
+                        break;
+                    case 40: // down
+                        turn(-1);
+                        break;
+                    case 32: // spacebar				
+                        fall = true;
+                        move(0, 1);
+                        break;
+                    case 27: // Esc
+                    case 80: // "P"					
+                        paused = !paused;
+                        move(0, 0);
+                        break;
                 }
             }
-            updateScore();
-        }
 
-        function getFullLinesArray(cells) {
-            var i,
-                j,
-                res = [],
-                cnt;
+            function holdThisFigAndGetNext() {
+                stkn = getAddition(stkn, fig).arr;
+                fig = getNewFig();
 
-            for (j = 0; j < nrow; j++) {
-                cnt = 0;
-                for (i = 0; i < ncol; i++) {
-                    if (cells[i][j] > 0) cnt++;
+                if (getAddition(stkn, fig).intersect) {
+                    gameOver();
+                    return;
                 }
-                if (cnt == ncol) {
-                    res.push(j);
+                removeLines(getFullLinesArray(stkn));
+                drawAllCells(getAddition(stkn, fig).arr);
+            }
+
+            function removeLines(fullRowIndexes) {
+                var i,
+                    linesScores = [1, 100, 300, 700, 1500];
+
+                if (!fullRowIndexes || fullRowIndexes.length < 1) return;
+
+                linesCnt += fullRowIndexes.length;
+
+                level = Math.floor(linesCnt / 10);
+                if (level > 9) level = 9;
+
+                setSpeed(level);
+
+                score += Math.floor(linesScores[fullRowIndexes.length] * 0.25 * (level + 1));
+
+                for (row in fullRowIndexes) {
+                    for (i = 0; i < ncol; i++) {
+                        stkn[i].splice(fullRowIndexes[row], 1);
+                        stkn[i].unshift(0);
+                    }
+                }
+                updateScore();
+            }
+
+            function getFullLinesArray(cells) {
+                var i,
+                    j,
+                    res = [],
+                    cnt;
+
+                for (j = 0; j < nrow; j++) {
+                    cnt = 0;
+                    for (i = 0; i < ncol; i++) {
+                        if (cells[i][j] > 0) cnt++;
+                    }
+                    if (cnt == ncol) {
+                        res.push(j);
+                    }
+                }
+                return res;
+            }
+
+            function move(x, y) {
+                var nextFigState = $.extend(true, {}, fig),
+                    unionObj;
+
+                $('.pause').toggle(paused);
+                if (paused) return;
+
+                nextFigState.x += x;
+                nextFigState.y += y;
+
+                if (fall) {
+                    nextFigState.y += 1;
+                    if (getAddition(stkn, nextFigState).intersect || isOutOfBoundsY(nextFigState)) {
+                        fall = false;
+                    }
+                    nextFigState.y -= 1;
+                    setSpeed(level);
+                }
+
+                if (!checkBounds(nextFigState)) return false;
+
+                unionObj = getAddition(stkn, nextFigState);
+                if (!unionObj.intersect) {
+                    fig = nextFigState;
+                    drawAllCells(unionObj.arr);
+                } else {
+                    if (y == 0) return false;
+                    holdThisFigAndGetNext();
                 }
             }
-            return res;
-        }
 
-        function move(x, y) {
-            var nextFigState = $.extend(true, {}, fig),
-                unionObj;
+            function turn(direction) {
+                var nextFigState = $.extend(true, {}, fig),
+                    unionObj;
 
-			$('.pause').toggle(paused);
-			if (paused) return;
-			
-            nextFigState.x += x;
-            nextFigState.y += y;
-			
-			if (fall) {
-				nextFigState.y += 1;
-				if (getAddition(stkn, nextFigState).intersect || isOutOfBoundsY(nextFigState)) {
-					fall = false;
-				};				
-				nextFigState.y -= 1;
-				setSpeed(level);
-			}
+                if (paused) return;
 
-            if (!checkBounds(nextFigState)) return false;	
-			
-            unionObj = getAddition(stkn, nextFigState);
-            if (!unionObj.intersect) {
-                fig = nextFigState;
-                drawAllCells(unionObj.arr);
-            } else {
-				if (y == 0) return false;
-                holdThisFigAndGetNext();
+                nextFigState.turn += direction;
+                if (nextFigState.turn > 3) nextFigState.turn = 0;
+                if (nextFigState.turn < 0) nextFigState.turn = 3;
+
+                if (!checkBounds(nextFigState)) return false;
+
+                unionObj = getAddition(stkn, nextFigState);
+                if (!unionObj.intersect) {
+                    fig = nextFigState;
+                    drawAllCells(unionObj.arr);
+                } else {
+                    return false;
+                }
             }
-        }
 
-        function turn(direction) {
-            var nextFigState = $.extend(true, {}, fig),
-                unionObj;
-			
-			if (paused) return;
-			
-            nextFigState.turn += direction;
-            if (nextFigState.turn > 3) nextFigState.turn = 0;
-            if (nextFigState.turn < 0) nextFigState.turn = 3;
+            function checkBounds(figObj) {
+                if (isOutOfBoundsX(figObj)) {
+                    return false;
+                }
+                if (isOutOfBoundsY(figObj)) {
+                    holdThisFigAndGetNext();
+                    return false;
+                }
+                return true;
+            }
 
-            if (!checkBounds(nextFigState)) return false;
+            function isOutOfBoundsX(figObj) {
+                var i,
+                    j,
+                    figArr = figs[figObj.type][figObj.turn];
 
-            unionObj = getAddition(stkn, nextFigState);
-            if (!unionObj.intersect) {
-                fig = nextFigState;
-                drawAllCells(unionObj.arr);
-            } else {
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        if (figArr[i][j] && i + figObj.x > ncol - 1) return true;
+                        if (figArr[i][j] && i + figObj.x < 0) return true;
+                    }
+                }
                 return false;
             }
-        }
 
-        function checkBounds(figObj) {
-            if (isOutOfBoundsX(figObj)) {
+            function isOutOfBoundsY(figObj) {
+                var i,
+                    j,
+                    figArr = figs[figObj.type][figObj.turn];
+
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        if (figArr[i][j] && j + figObj.y > nrow - 1) return true;
+                    }
+                }
                 return false;
             }
-            if (isOutOfBoundsY(figObj)) {
-                holdThisFigAndGetNext();
-                return false;
-            }
-            return true;
-        }
 
-        function isOutOfBoundsX(figObj) {
-            var i,
-                j,
-                figArr = figs[figObj.type][figObj.turn];
-
-            for (i = 0; i < 4; i++) {
-                for (j = 0; j < 4; j++) {
-                    if (figArr[i][j] && i + figObj.x > ncol - 1) return true;
-                    if (figArr[i][j] && i + figObj.x < 0) return true;
-                }
-            }
-            return false;
-        }
-
-        function isOutOfBoundsY(figObj) {
-            var i,
-                j,
-                figArr = figs[figObj.type][figObj.turn];
-
-            for (i = 0; i < 4; i++) {
-                for (j = 0; j < 4; j++) {
-                    if (figArr[i][j] && j + figObj.y > nrow - 1) return true;
-                }
-            }
-            return false;
-        }
-
-        function getAddition(targ, figObj) {
-            var i,
-                j,
-                result = $.extend(true, [], targ),
-                figArr = figs[figObj.type][figObj.turn],
-                intersect = 0,
-                nx,
-                ny;
+            function getAddition(targ, figObj) {
+                var i,
+                    j,
+                    result = $.extend(true, [], targ),
+                    figArr = figs[figObj.type][figObj.turn],
+                    intersect = 0,
+                    nx,
+                    ny;
 
 
-            for (i = 0; i < 4; i++) {
-                nx = i + figObj.x;
+                for (i = 0; i < 4; i++) {
+                    nx = i + figObj.x;
 
-                for (j = 0; j < 4; j++) {
-                    ny = j + figObj.y;
+                    for (j = 0; j < 4; j++) {
+                        ny = j + figObj.y;
 
-                    if (nx > -1 && ny > -1 && nx < ncol && ny < nrow) {
+                        if (nx > -1 && ny > -1 && nx < ncol && ny < nrow) {
 
-                        if (targ[nx][ny]) {
+                            if (targ[nx][ny]) {
 
-                            if (figArr[i][j]) {
+                                if (figArr[i][j]) {
 
-                                result[nx][ny] = 1;
-                                intersect++;
+                                    result[nx][ny] = 1;
+                                    intersect++;
 
+                                }
+                            } else {
+                                result[nx][ny] = figArr[i][j];
                             }
-                        } else {
-                            result[nx][ny] = figArr[i][j];
                         }
                     }
                 }
+                return {
+                    arr: result,
+                    intersect: intersect
+                };
             }
-            return {
-                arr: result,
-                intersect: intersect
-            };
-        }
 
-        function getNewFig() {
-            var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
+            function getNewFig() {
+                var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
 
-            nextFig = makeFig();
-            drawNextFigHint(nextFig);
-            return fig;
-        }
+                nextFig = makeFig();
+                drawNextFigHint(nextFig);
+                return fig;
+            }
 
-        function makeFig() {
-			var ty = Math.floor(Math.random() * 7),
-				tu = Math.floor(Math.random() * 4);
-			return {
-                type: ty,
-                turn: tu,
-                x: figoffsetx,
-                y: figsOffsetY[ty][tu]
-            };
-        }
+            function makeFig() {
+                var ty = Math.floor(Math.random() * 7),
+                    tu = Math.floor(Math.random() * 4);
+                return {
+                    type: ty,
+                    turn: tu,
+                    x: figoffsetx,
+                    y: figsOffsetY[ty][tu]
+                };
+            }
 
-        function drawNextFigHint(figObj) {
-            var i,
-                j,
-                fig = figs[figObj.type][figObj.turn];
+            function drawNextFigHint(figObj) {
+                var i,
+                    j,
+                    fig = figs[figObj.type][figObj.turn];
 
-            for (i = 0; i < 4; i++) {
-                for (j = 0; j < 4; j++) {
-                    updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, '.prevcell');
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, '.prevcell');
+                    }
                 }
             }
-        }
 
-        function updateCellColor(x, y, colorIndex, pefix) {
-            var $cell = $(pefix + x + '-' + y);
+            function updateCellColor(x, y, colorIndex, pefix) {
+                var $cell = $(pefix + x + '-' + y);
 
-            $cell.removeClass(cellClasses.join(' '))
-				 .addClass(cellClasses[colorIndex]);
-        }
+                $cell.removeClass(cellClasses.join(' '))
+                    .addClass(cellClasses[colorIndex]);
+            }
 
-        function drawAllCells(stk) {
-            var i,
-                j;
+            function drawAllCells(stk) {
+                var i,
+                    j;
 
-            for (i = 0; i < ncol; i++) {
-                for (j = 0; j < nrow; j++) {
-                    updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
+                for (i = 0; i < ncol; i++) {
+                    for (j = 0; j < nrow; j++) {
+                        updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
+                    }
                 }
             }
-        }
 
-        function prepareAllCells($container, $prev) {
-            var i,
-                j,
-                arr = [];
+            function prepareAllCells($container, $prev) {
+                var i,
+                    j,
+                    arr = [],
+                    cls,
+                    $newcell,
+                    l,
+                    t;
 
-            for (i = 0; i < ncol; i++) {
-                arr[i] = [];
-                for (j = 0; j < nrow; j++) {
-                    arr[i][j] = 0;
-                    var cls = 'cell' + i + '-' + j + ' cell ' + cellClasses[0],
-                        $newcell = $("<div class='" + cls + "'></div>"),
-                        l = i * size,
+                for (i = 0; i < ncol; i++) {
+                    arr[i] = [];
+                    for (j = 0; j < nrow; j++) {
+                        arr[i][j] = 0;
+                        cls = 'cell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
                         t = j * size;
 
-                    $newcell.width(size)
-                        .height(size)
-                        .css({
-                            'left': l,
-                            'top': t
-                        });
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
 
-                    $container.append($newcell);
+                        $container.append($newcell);
+                    }
                 }
-            }
 
-            for (i = 0; i < 4; i++) {
-                for (j = 0; j < 4; j++) {
-                    var cls = 'prevcell' + i + '-' + j + ' cell ' + cellClasses[0],
-                        $newcell = $("<div class='" + cls + "'></div>"),
-                        l = i * size,
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        cls = 'prevcell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
                         t = j * size;
 
-                    $newcell.width(size)
-                        .height(size)
-                        .css({
-                            'left': l,
-                            'top': t
-                        });
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
 
-                    $prev.append($newcell);
+                        $prev.append($newcell);
+                    }
+                }
+                return arr;
+            }
+
+            function gameOver() {
+                clearTimeout(timer);
+                $(document).off('keydown');
+                $('.gameover').show();
+                if (linesCnt > 0) {
+                    $('.resultContainer').show();
+                    $('.save').one('click', saveResultClick);
+                    $('.userName').get(0).focus();
+                } else {
+                    $('.resultContainer').hide();
+                    $startButton.show();
                 }
             }
-            return arr;
-        }
 
-        function gameOver() {
-            clearTimeout(timer);
-            $(document).off('keydown');			
-            $('.gameover').show();
-			if (linesCnt > 0) {
-				$('.resultContainer').show();
-				$('.save').one('click', saveResultClick);
-				$('.userName').get(0).focus(); 
-			} else {
-				$('.resultContainer').hide();
-				$startButton.show();
-			}
-        }		
+            function saveResultClick() {
+                var username = $('.userName').val(),
+                    result = {
+                        name: username,
+                        score: score,
+                        lines: linesCnt,
+                        level: level
+                    };
 
-        function saveResultClick() {
-			var username = $('.userName').val(),
-				result = {
-					name  : username, 
-					score : score, 
-					lines : linesCnt, 
-					level : level
-				};
-			
-			$('.resultContainer').hide();
-			
-			if (username) {
-				$.post("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey, result)
-					.done(function(data) {
-						loadHighScoreTable(data._id);
-					})
-					.fail(function() {
-						alert( "There was an error saving your result" );
-						showHighScoreTable(highscore);
-					})
-					.always(function() {
-						highscore.push(result);
-						$startButton.show();
-						localPlayersList.push(username);
-						localStorage.setItem('usernames',  $.unique(localPlayersList).join(';'));						
-					});				
-			} else {
-				$startButton.show();
-			}
-		}
-		
-        function updateScore() {
-            $('.score').html(score);
-            $('.lines').html(linesCnt);
-            $('.level').html(level);
-        }
-		
-		function loadHighScoreTable(highLightId) {
-			$.get("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey)
-				.done(function(data) {
-					highscore = data;
-					showHighScoreTable(highscore, highLightId);
-				});
-        		
-		}
-		
-		function showHighScoreTable(hscore, highLightId) {
-			var i,
-				j,
-				itm,
-				$list = $('.highScoreTable ul'),
-				highLight,
-				nday = 365,
-				now = new Date(),
-				arr = $.grep(hscore, function(item) {
-					var dtDays = (now -  new Date(item.created_at)) / (3600 * 24 * 1000);
-					return dtDays < nday
-				}),
-				results = arr.sort(function (a, b) {
-					return b.score - a.score;
-				});
-			
-			$list.html("<li class=\"title\"><i>#</i><b>Player</b><span class='scoreVal'>score</span><span>lines</span><span>level</span></li>");
-			for (i = 0; i < 10; i++) {
-				j = highscorePage * 10 + i;
-				if (j > results.length - 1) break;
-				
-				itm = results[j];
-				
-				highLight = itm._id && itm._id == highLightId ? 'marked' : '';
+                $('.resultContainer').hide();
 
-				$item = $("<li class='" + highLight + "' title='" 
-									+ new Date(itm.created_at) + "'><i>" 
-									+ (j - 0 + 1) + "</i><b>" 
-									+ itm.name + "</b><span class='scoreVal'>" 
-									+ itm.score + "</span><span>" 
-									+ itm.lines + "</span><span>" 
-									+ itm.level + "</span></li>");
-				$list.append($item);			
-			}		
-			$('.hsl').off().on('click', function(e) {
-				e.preventDefault();
-				if (highscorePage > 0) {
-					highscorePage--;
-					showHighScoreTable(hscore, highLightId);
-				}
-			});
-			$('.hsr').off().on('click', function(e) {
-				e.preventDefault();
-				if (highscorePage < ((results.length - 1) / 10) - 1) {
-					highscorePage++;
-					showHighScoreTable(hscore, highLightId);
-				}
-			});
-		}
-		
-		function getLoacalPlayers() {
-			if (localStorage && localStorage.getItem('usernames')) {
-				return localStorage.getItem('usernames').split(';')
-			}
-			return [];
-		}
-				
-		function loadLoacalPlayers() {					
-			var $players = $('.players');
-		
-			localPlayersList = getLoacalPlayers();
-			
-			if (localPlayersList.length) {
-				$players.html('');
-				$.each(localPlayersList, function(key, value) {   
-					$players
-					 .append($("<option></option>")
-								.attr("value", value)
-								.text(value)); 
-				});		
-				$players
-					.show()
-					.off('click')
-					.on('click', function(e){
-						$('.userName').val($(e.target).val());					
-					})
-			}
-		}
-		
-		$(document).ready(function() {
-            init();
-        });		
+                if (username) {
+                    $.post("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey, result)
+                        .done(function (data) {
+                            loadHighScoreTable(data._id);
+                        })
+                        .fail(function () {
+                            alert("There was an error saving your result");
+                            showHighScoreTable(highscore);
+                        })
+                        .always(function () {
+                            highscore.push(result);
+                            $startButton.show();
+                            localPlayersList.push(username);
+                            localStorage.setItem('usernames', $.unique(localPlayersList).join(';'));
+                        });
+                } else {
+                    $startButton.show();
+                }
+            }
 
-	}(jQuery));
+            function updateScore() {
+                $('.score').html(score);
+                $('.lines').html(linesCnt);
+                $('.level').html(level);
+            }
+
+            function loadHighScoreTable(highLightId) {
+                $.get("https://openws.herokuapp.com/" + storageCollection + "?apiKey=" + storageApiKey)
+                    .done(function (data) {
+                        highscore = data;
+                        showHighScoreTable(highscore, highLightId);
+                    });
+
+            }
+
+            function showHighScoreTable(hscore, highLightId) {
+                var i,
+                    j,
+                    itm,
+                    $list = $('.highScoreTable ul'),
+                    highLight,
+                    nday = 365,
+                    now = new Date(),
+                    arr = $.grep(hscore, function (item) {
+                        var dtDays = (now - new Date(item.created_at)) / (3600 * 24 * 1000);
+                        return dtDays < nday
+                    }),
+                    results = arr.sort(function (a, b) {
+                        return b.score - a.score;
+                    });
+
+                $list.html("<li class=\"title\"><i>#</i><b>Player</b><span class='scoreVal'>score</span><span>lines</span><span>level</span></li>");
+                for (i = 0; i < 10; i++) {
+                    j = highscorePage * 10 + i;
+                    if (j > results.length - 1) break;
+
+                    itm = results[j];
+
+                    highLight = itm._id && itm._id == highLightId ? 'marked' : '';
+
+                    $item = $("<li class='" + highLight + "' title='"
+                        + itm.created_at ? new Date(itm.created_at) : '' + "'><i>"
+                        + (j - 0 + 1) + "</i><b>"
+                        + itm.name + "</b><span class='scoreVal'>"
+                        + itm.score + "</span><span>"
+                        + itm.lines + "</span><span>"
+                        + itm.level + "</span></li>");
+                    $list.append($item);
+                }
+                $('.hsl').off().on('click', function (e) {
+                    e.preventDefault();
+                    if (highscorePage > 0) {
+                        highscorePage--;
+                        showHighScoreTable(hscore, highLightId);
+                    }
+                });
+                $('.hsr').off().on('click', function (e) {
+                    e.preventDefault();
+                    if (highscorePage < ((results.length - 1) / 10) - 1) {
+                        highscorePage++;
+                        showHighScoreTable(hscore, highLightId);
+                    }
+                });
+            }
+
+            function getLoacalPlayers() {
+                if (localStorage && localStorage.getItem('usernames')) {
+                    return localStorage.getItem('usernames').split(';')
+                }
+                return [];
+            }
+
+            function loadLoacalPlayers() {
+                var $players = $('.players');
+
+                localPlayersList = getLoacalPlayers();
+
+                if (localPlayersList.length) {
+                    $players.html('');
+                    $.each(localPlayersList, function (key, value) {
+                        $players
+                            .append($("<option></option>")
+                                .attr("value", value)
+                                .text(value));
+                    });
+                    $players
+                        .show()
+                        .off('click')
+                        .on('click', function (e) {
+                            $('.userName').val($(e.target).val());
+                        })
+                }
+            }
+
+            $(document).ready(function () {
+                init();
+            });
+
+        }(jQuery));
     </script>
 </head>
 <body>
-	<div class="infoContainer">
-		<div class="prev"></div>
-		<div class="score_container">
-			Score: <span class="score"></span> 
-			Lines: <span class="lines"></span> 
-			Level: <span class="level"></span>
-		</div>
-		<div class="highScoreTable">
-			<div>High score
-				<a href="#" class="hsl">&uarr;</a>
-				<a href="#" class="hsr">&darr;</a>
-			</div>
-			<ul>
-				<li>Loading... &#9203;</li>
-			</ul>
-		</div>
-		
-		<button class="startButton">Start</button>
-	</div>
-    <div class="stkn">
-		<div class="gameover">
-			<h3>Gameover</h3>
-			<div class="resultContainer">
-				Your score:<span class="score"></span>
-				<br>	
-				Name 
-				<div class="userNameContainer">				
-					<input type="text" class="userName">
-					<select class="players"></select>
-				</div> 
-				<button class="save">Save</button>			
-			</div>
-		</div>	
-		<div class="pause">
-			<h3>Pause</h3>			
-			<div>press ESC or P to continue</div>
-		</div>			
-	</div>
+<div class="infoContainer">
+    <div class="prev"></div>
+    <div class="score_container">
+        Score: <span class="score"></span>
+        Lines: <span class="lines"></span>
+        Level: <span class="level"></span>
+    </div>
+    <div class="highScoreTable">
+        <div>High score
+            <a href="#" class="hsl">&uarr;</a>
+            <a href="#" class="hsr">&darr;</a>
+        </div>
+        <ul>
+            <li>Loading... &#9203;</li>
+        </ul>
+    </div>
+
+    <button class="startButton">Start</button>
+</div>
+<div class="stkn">
+    <div class="gameover">
+        <h3>Gameover</h3>
+        <div class="resultContainer">
+            Your score:<span class="score"></span>
+            <br>
+            Name
+            <div class="userNameContainer">
+                <input type="text" class="userName">
+                <select class="players"></select>
+            </div>
+            <button class="save">Save</button>
+        </div>
+    </div>
+    <div class="pause">
+        <h3>Pause</h3>
+        <div>press ESC or P to continue</div>
+    </div>
+</div>
 </body>
 </html>
