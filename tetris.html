@@ -684,7 +684,7 @@
                     highLight = itm._id && itm._id == highLightId ? 'marked' : '';
 
                     $item = $("<li class='" + highLight + "' title='"
-                        + itm.created_at ? new Date(itm.created_at) : '' + "'><i>"
+                        + (itm.created_at ? new Date(itm.created_at) : '') + "'><i>"
                         + (j - 0 + 1) + "</i><b>"
                         + itm.name + "</b><span class='scoreVal'>"
                         + itm.score + "</span><span>"
