@@ -1,5 +1,5 @@
 # FastTet is a classic tetris on JavaScript with jQuery
-Features
+###Features
 * Classic game type 
 * Canvas element for drawings
 * Next figure preview window
@@ -10,5 +10,6 @@ Features
 # <a href="http://htmlpreview.github.io/?https://github.com/Zak-r2/fasttet/blob/master/tetris.html">Play ►</a> right now
 
 <a href="http://htmlpreview.github.io/?https://github.com/Zak-r2/fasttet/blob/master/tetris.html"><img src="fasttet_v1.0.PNG"></a>
+
 
 
