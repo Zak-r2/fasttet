@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.1</title>
+    <title>FastTet v1.0</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
@@ -17,17 +17,46 @@
             left: 300px;
         }
 
-        #canvaMain {
-            position: absolute;            
-        }
-
-        #canvaHint {
-            position: absolute;
-        }
-
         .prev {
             border: 1px solid;
             position: relative;
+        }
+
+        .cell {
+            position: absolute;
+            border: 1px solid #ddd;
+        }
+
+        .whcell {
+            background-color: white;
+        }
+
+        .c1 {
+            background-color: #00f0f0;
+        }
+
+        .c2 {
+            background-color: #0000f0;
+        }
+
+        .c3 {
+            background-color: #f0a000;
+        }
+
+        .c4 {
+            background-color: #f0f000;
+        }
+
+        .c5 {
+            background-color: #00f000;
+        }
+
+        .c6 {
+            background-color: #a000f0;
+        }
+
+        .c7 {
+            background-color: #f00000;
         }
 
         .pause {
@@ -151,6 +180,7 @@
                 $prev,
                 timer,
                 level,
+                cellClasses = ['whcell', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
                 fig,
                 nextFig,
                 fall = false,
@@ -165,10 +195,6 @@
                 storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
                 storageCollection = "fasttetres",
                 localPlayersList = [],
-                ctxMain,
-                ctxHint,
-                figColors = ['#ffffff','#00f0f0','#0000f0','#f0a000','#f0f000','#00f000','#a000f0','#f00000'],
-
                 // Array[figType][figTurn][col][row] value = color number
                 figs = [[
                     [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],  // fig l
@@ -223,24 +249,15 @@
                 $prev = $('.prev');
                 $startButton = $('.startButton');
 
-                $prev.width(size * 4)
-                     .height(size * 4);
+                $prev.width(size * 4);
+                $prev.height(size * 4);
 
-                $stkn.width(size * ncol)
-                     .height(size * nrow);
-
-
-                ctxMain = document.getElementById("canvaMain").getContext('2d');
-                ctxHint = document.getElementById("canvaHint").getContext('2d');
-
-                ctxMain.canvas.height =(size * nrow);
-                ctxMain.canvas.width = (size * ncol);
-
-                ctxHint.canvas.height =(size * 4);
-                ctxHint.canvas.width = (size * 4);
-
+                $stkn.width(size * ncol);
+                $stkn.height(size * nrow);
 
                 figoffsetx = Math.floor(ncol / 2) - 2;
+
+                stkn = prepareAllCells($stkn, $prev);
 
                 loadHighScoreTable();
                 $startButton.on('click', startNewGame);
@@ -272,7 +289,7 @@
                 if (timer) clearTimeout(timer);
                 timer = setInterval(function () {
                     if (!paused) move(0, 1);
-                }, fall ? 20 : delaysByLevel[lvl]);
+                }, fall ? 40 : delaysByLevel[lvl]);
             }
 
             function onKeyDown(e) {
@@ -450,6 +467,7 @@
                     j,
                     result = $.extend(true, [], targ),
                     figArr = figs[figObj.type][figObj.turn],
+                    intersect = 0,
                     nx,
                     ny;
 
@@ -467,10 +485,7 @@
                                 if (figArr[i][j]) {
 
                                     result[nx][ny] = 1;
-                                    return {
-                                        arr: [],
-                                        intersect: 1
-                                    };
+                                    intersect++;
 
                                 }
                             } else {
@@ -481,7 +496,7 @@
                 }
                 return {
                     arr: result,
-                    intersect: 0
+                    intersect: intersect
                 };
             }
 
@@ -511,24 +526,16 @@
 
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 4; j++) {
-                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, ctxHint);
+                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, '.prevcell');
                     }
                 }
             }
 
-            function updateCellColor(x, y, colorIndex, ctx) {
-                var xx = x * size,
-                    yy = y * size;
+            function updateCellColor(x, y, colorIndex, pefix) {
+                var $cell = $(pefix + x + '-' + y);
 
-                ctx.beginPath();
-                ctx.lineWidth="2";
-                ctx.strokeStyle="#DDDDDD";
-                ctx.rect(xx, yy, x + size, y+ size);
-                ctx.stroke();
-
-                ctx.fillStyle = figColors[colorIndex];
-                ctx.fillRect(xx, yy, x + size, y+ size);
-                  
+                $cell.removeClass(cellClasses.join(' '))
+                    .addClass(cellClasses[colorIndex]);
             }
 
             function drawAllCells(stk) {
@@ -537,17 +544,56 @@
 
                 for (i = 0; i < ncol; i++) {
                     for (j = 0; j < nrow; j++) {
-                        updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, ctxMain);
+                        updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
                     }
                 }
             }
 
-            function prepareAllCells() {
+            function prepareAllCells($container, $prev) {
                 var i,
-                    arr = [];                
+                    j,
+                    arr = [],
+                    cls,
+                    $newcell,
+                    l,
+                    t;
 
                 for (i = 0; i < ncol; i++) {
-                    arr[i] = [];                    
+                    arr[i] = [];
+                    for (j = 0; j < nrow; j++) {
+                        arr[i][j] = 0;
+                        cls = 'cell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
+                        t = j * size;
+
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
+
+                        $container.append($newcell);
+                    }
+                }
+
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        cls = 'prevcell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
+                        t = j * size;
+
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
+
+                        $prev.append($newcell);
+                    }
                 }
                 return arr;
             }
@@ -609,6 +655,7 @@
                         highscore = data;
                         showHighScoreTable(highscore, highLightId);
                     });
+
             }
 
             function showHighScoreTable(hscore, highLightId) {
@@ -699,7 +746,7 @@
 </head>
 <body>
 <div class="infoContainer">
-    <div class="prev"><canvas height='100' width='100' id='canvaHint'>...</canvas></div>
+    <div class="prev"></div>
     <div class="score_container">
         Score: <span class="score"></span>
         Lines: <span class="lines"></span>
@@ -717,9 +764,7 @@
 
     <button class="startButton">Start</button>
 </div>
-
 <div class="stkn">
-    <canvas id='canvaMain'>Please update browser</canvas>
     <div class="gameover">
         <h3>Gameover</h3>
         <div class="resultContainer">
