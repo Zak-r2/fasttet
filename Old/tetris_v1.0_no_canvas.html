@@ -289,7 +289,7 @@
                 if (timer) clearTimeout(timer);
                 timer = setInterval(function () {
                     if (!paused) move(0, 1);
-                }, fall ? 40 : delaysByLevel[lvl]);
+                }, fall ? 20 : delaysByLevel[lvl]);
             }
 
             function onKeyDown(e) {
