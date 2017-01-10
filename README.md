@@ -6,7 +6,7 @@
 
 Features
 * Classic game type 
-* Only HTML/CSS layout without canvas
+* Canvas element for drawings
 * Next figure preview window
 * High score table supplied by <a href="https://openws-app.herokuapp.com/#/">OpenWS</a>
 * Single file app
