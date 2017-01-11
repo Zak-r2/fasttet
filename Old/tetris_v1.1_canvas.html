@@ -8,7 +8,7 @@
         }
 
         .stkn {
-            border: 1px solid #aaa;
+            border: 1px solid;
             position: relative;
         }
 
@@ -26,7 +26,7 @@
         }
 
         .prev {
-            border: 1px solid #aaa;
+            border: 1px solid;
             position: relative;
         }
 
@@ -146,7 +146,6 @@
             var ncol = 10,
                 nrow = 20,
                 stkn = [],
-                replayRecord = [],                
                 size = 25,
                 $stkn,
                 $prev,
@@ -253,7 +252,7 @@
                 score = 0;
                 linesCnt = 0;
                 level = 0;
-                stkn = prepareAllCells();
+                stkn = prepareAllCells($stkn, $prev);
                 fig = getNewFig();
 
                 drawAllCells(getAddition(stkn, fig).arr);
@@ -312,7 +311,6 @@
                 }
                 removeLines(getFullLinesArray(stkn));
                 drawAllCells(getAddition(stkn, fig).arr);
-                addToReplayRecord(fig);                
             }
 
             function removeLines(fullRowIndexes) {
@@ -324,7 +322,7 @@
                 linesCnt += fullRowIndexes.length;
 
                 level = Math.floor(linesCnt / 10);
-                if (level > 10) level = 10;
+                if (level > 9) level = 9;
 
                 setSpeed(level);
 
@@ -357,7 +355,7 @@
                 return res;
             }
 
-            function move(x, y) {                
+            function move(x, y) {
                 var nextFigState = $.extend(true, {}, fig),
                     unionObj;
 
@@ -382,7 +380,6 @@
                 if (!unionObj.intersect) {
                     fig = nextFigState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(nextFigState);
                 } else {
                     if (y == 0) return false;
                     holdThisFigAndGetNext();
@@ -405,7 +402,6 @@
                 if (!unionObj.intersect) {
                     fig = nextFigState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(fig);
                 } else {
                     return false;
                 }
@@ -508,14 +504,6 @@
                 };
             }
 
-            function addToReplayRecord(figObj) {
-                /*
-                var newRec = [figObj.turn, figObj.type, figObj.x, figObj.y];
-                replayRecord.push(newRec);
-                console.log(newRec);
-                */
-            }
-
             function drawNextFigHint(figObj) {
                 var i,
                     j,
@@ -535,11 +523,12 @@
                 ctx.beginPath();
                 ctx.lineWidth="2";
                 ctx.strokeStyle="#DDDDDD";
-                ctx.rect(xx, yy, size - 1, size - 1);
+                ctx.rect(xx, yy, x + size, y+ size);
                 ctx.stroke();
 
                 ctx.fillStyle = figColors[colorIndex];
-                ctx.fillRect(xx, yy, size - 1, size - 1);                  
+                ctx.fillRect(xx, yy, x + size, y+ size);
+                  
             }
 
             function drawAllCells(stk) {
@@ -550,7 +539,7 @@
                     for (j = 0; j < nrow; j++) {
                         updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, ctxMain);
                     }
-                }                                
+                }
             }
 
             function prepareAllCells() {
