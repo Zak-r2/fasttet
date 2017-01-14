@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.2</title>
+    <title>FastTet v1.1</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
@@ -10,11 +10,12 @@
         .stkn {
             border: 1px solid #aaa;
             position: relative;
+            left: 400px;
         }
 
         .infoContainer {
             position: absolute;
-            left: 300px;
+            left: 0px;
         }
 
         #canvaMain {
@@ -143,12 +144,11 @@
     <script>
         (function ($) {
 
-            var ncol = 10,
-                nrow = 20,
+            var ncol = 50,
+                nrow = 40,
                 stkn = [],
-				oldStkn = [],
                 replayRecord = [],                
-                size = 25,
+                size = 20,
                 $stkn,
                 $prev,
                 timer,
@@ -219,6 +219,8 @@
                     [0, -1, 0, 0]
                 ];
 
+	
+				
 
             function init() {
                 $stkn = $('.stkn');
@@ -244,8 +246,8 @@
 
                 figoffsetx = Math.floor(ncol / 2) - 2;
 
-                loadHighScoreTable();
-                $startButton.on('click', startNewGame);
+                //loadHighScoreTable();
+                startNewGame();
             }
 
             function startNewGame() {
@@ -256,6 +258,9 @@
                 level = 0;
                 stkn = prepareAllCells();
                 fig = getNewFig();
+
+console.profile("One fig fall");
+
 
                 drawAllCells(getAddition(stkn, fig).arr);
                 updateScore();
@@ -271,10 +276,12 @@
             }
 
             function setSpeed(lvl) {
+
                 if (timer) clearTimeout(timer);
                 timer = setInterval(function () {
                     if (!paused) move(0, 1);
-                }, fall ? 20 : delaysByLevel[lvl]);
+                }, 0);
+				
             }
 
             function onKeyDown(e) {
@@ -307,8 +314,9 @@
                 stkn = getAddition(stkn, fig).arr;
                 fig = getNewFig();
 
-                if (getAddition(stkn, fig).intersect) {
+                if (fig.type > 2) {
                     gameOver();
+console.profileEnd();		     
                     return;
                 }
                 removeLines(getFullLinesArray(stkn));
@@ -497,10 +505,10 @@
                 drawNextFigHint(nextFig);
                 return fig;
             }
-
+var ff = 0;
             function makeFig() {
-                var ty = Math.floor(Math.random() * 7),
-                    tu = Math.floor(Math.random() * 4);
+                var ty = ff++,
+                    tu = 0;
                 return {
                     type: ty,
                     turn: tu,
@@ -543,18 +551,38 @@
                 ctx.fillRect(xx, yy, size - 1, size - 1);                  
             }
 
+var lastCalledTime,
+	fps = 0,
+	fpsm = 0,
+	fpsi = 0;
+function requestAnimFrame() {
+  if(!lastCalledTime) {
+     lastCalledTime = performance.now();
+     fps = 0;
+     return;
+  }
+  delta = (performance.now() - lastCalledTime)/1000;
+  lastCalledTime = performance.now();
+  fps = 1/delta;
+}								
+
             function drawAllCells(stk) {
+				requestAnimFrame();
                 var i,
                     j;
 
                 for (i = 0; i < ncol; i++) {
                     for (j = 0; j < nrow; j++) {
-						if (!oldStkn[i] || oldStkn[i][j] != stk[i][j]) {
-							updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, ctxMain);
-						}
+                        updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, ctxMain);
                     }
-                }                                
-				oldStkn = $.extend(true, {}, stk);
+                }                  
+				requestAnimFrame();
+				if (fps) {
+					fpsi++;
+					fpsm += fps; 
+				}
+				$('.fps').html((fpsm / fpsi).toFixed(2));
+				
             }
 
             function prepareAllCells() {
@@ -714,7 +742,7 @@
 </head>
 <body>
 <div class="infoContainer">
-    <div class="prev"><canvas id='canvaHint'>...</canvas></div>
+    <div class="prev"><canvas height='100' width='100' id='canvaHint'>...</canvas></div>
     <div class="score_container">
         Score: <span class="score"></span>
         Lines: <span class="lines"></span>
@@ -729,7 +757,7 @@
             <li>Loading... &#9203;</li>
         </ul>
     </div>
-
+	<span class="fps">-</span>fps
     <button class="startButton">Start</button>
 </div>
 

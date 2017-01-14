@@ -1,33 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.2</title>
+    <title>FastTet v1.0</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
         }
 
         .stkn {
-            border: 1px solid #aaa;
+            border: 1px solid;
             position: relative;
+            left: 400px;
         }
 
         .infoContainer {
             position: absolute;
-            left: 300px;
-        }
-
-        #canvaMain {
-            position: absolute;            
-        }
-
-        #canvaHint {
-            position: absolute;
+            left: 0px;
         }
 
         .prev {
-            border: 1px solid #aaa;
+            border: 1px solid;
             position: relative;
+        }
+
+        .cell {
+            position: absolute;
+            border: 1px solid #ddd;
+        }
+
+        .whcell {
+            background-color: white;
+        }
+
+        .c1 {
+            background-color: #00f0f0;
+        }
+
+        .c2 {
+            background-color: #0000f0;
+        }
+
+        .c3 {
+            background-color: #f0a000;
+        }
+
+        .c4 {
+            background-color: #f0f000;
+        }
+
+        .c5 {
+            background-color: #00f000;
+        }
+
+        .c6 {
+            background-color: #a000f0;
+        }
+
+        .c7 {
+            background-color: #f00000;
         }
 
         .pause {
@@ -143,16 +173,16 @@
     <script>
         (function ($) {
 
-            var ncol = 10,
-                nrow = 20,
+            var ncol = 50,
+                nrow = 40,
                 stkn = [],
-				oldStkn = [],
                 replayRecord = [],                
-                size = 25,
+                size = 20,
                 $stkn,
                 $prev,
                 timer,
                 level,
+                cellClasses = ['whcell', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
                 fig,
                 nextFig,
                 fall = false,
@@ -167,10 +197,6 @@
                 storageApiKey = 'b6329695880d73afb2c14e8f57cff67f',
                 storageCollection = "fasttetres",
                 localPlayersList = [],
-                ctxMain,
-                ctxHint,
-                figColors = ['#ffffff','#00f0f0','#0000f0','#f0a000','#f0f000','#00f000','#a000f0','#f00000'],
-
                 // Array[figType][figTurn][col][row] value = color number
                 figs = [[
                     [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],  // fig l
@@ -225,27 +251,19 @@
                 $prev = $('.prev');
                 $startButton = $('.startButton');
 
-                $prev.width(size * 4)
-                     .height(size * 4);
+                $prev.width(size * 4);
+                $prev.height(size * 4);
 
-                $stkn.width(size * ncol)
-                     .height(size * nrow);
-
-
-                ctxMain = document.getElementById("canvaMain").getContext('2d');
-                ctxHint = document.getElementById("canvaHint").getContext('2d');
-
-                ctxMain.canvas.height =(size * nrow);
-                ctxMain.canvas.width = (size * ncol);
-
-                ctxHint.canvas.height =(size * 4);
-                ctxHint.canvas.width = (size * 4);
-
+                $stkn.width(size * ncol);
+                $stkn.height(size * nrow);
 
                 figoffsetx = Math.floor(ncol / 2) - 2;
 
-                loadHighScoreTable();
+                stkn = prepareAllCells($stkn, $prev);
+
+                //loadHighScoreTable();
                 $startButton.on('click', startNewGame);
+				startNewGame();
             }
 
             function startNewGame() {
@@ -254,8 +272,11 @@
                 score = 0;
                 linesCnt = 0;
                 level = 0;
-                stkn = prepareAllCells();
+                stkn = prepareAllCells($stkn, $prev);
                 fig = getNewFig();
+
+console.profile("One fig fall");
+
 
                 drawAllCells(getAddition(stkn, fig).arr);
                 updateScore();
@@ -271,10 +292,12 @@
             }
 
             function setSpeed(lvl) {
+
                 if (timer) clearTimeout(timer);
                 timer = setInterval(function () {
                     if (!paused) move(0, 1);
-                }, fall ? 20 : delaysByLevel[lvl]);
+                }, 0);
+				
             }
 
             function onKeyDown(e) {
@@ -307,13 +330,12 @@
                 stkn = getAddition(stkn, fig).arr;
                 fig = getNewFig();
 
-                if (getAddition(stkn, fig).intersect) {
+                if (fig.type > 2) {
                     gameOver();
                     return;
                 }
                 removeLines(getFullLinesArray(stkn));
                 drawAllCells(getAddition(stkn, fig).arr);
-                addToReplayRecord(fig);                
             }
 
             function removeLines(fullRowIndexes) {
@@ -325,7 +347,7 @@
                 linesCnt += fullRowIndexes.length;
 
                 level = Math.floor(linesCnt / 10);
-                if (level > 10) level = 10;
+                if (level > 9) level = 9;
 
                 setSpeed(level);
 
@@ -358,7 +380,7 @@
                 return res;
             }
 
-            function move(x, y) {                
+            function move(x, y) {
                 var nextFigState = $.extend(true, {}, fig),
                     unionObj;
 
@@ -383,7 +405,6 @@
                 if (!unionObj.intersect) {
                     fig = nextFigState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(nextFigState);
                 } else {
                     if (y == 0) return false;
                     holdThisFigAndGetNext();
@@ -406,7 +427,6 @@
                 if (!unionObj.intersect) {
                     fig = nextFigState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(fig);
                 } else {
                     return false;
                 }
@@ -455,6 +475,7 @@
                     j,
                     result = $.extend(true, [], targ),
                     figArr = figs[figObj.type][figObj.turn],
+                    intersect = 0,
                     nx,
                     ny;
 
@@ -472,10 +493,7 @@
                                 if (figArr[i][j]) {
 
                                     result[nx][ny] = 1;
-                                    return {
-                                        arr: [],
-                                        intersect: 1
-                                    };
+                                    intersect++;
 
                                 }
                             } else {
@@ -486,7 +504,7 @@
                 }
                 return {
                     arr: result,
-                    intersect: 0
+                    intersect: intersect
                 };
             }
 
@@ -497,24 +515,16 @@
                 drawNextFigHint(nextFig);
                 return fig;
             }
-
+var ff = 0;
             function makeFig() {
-                var ty = Math.floor(Math.random() * 7),
-                    tu = Math.floor(Math.random() * 4);
+                var ty = ff++,
+                    tu = 0;
                 return {
                     type: ty,
                     turn: tu,
                     x: figoffsetx,
                     y: figsOffsetY[ty][tu]
                 };
-            }
-
-            function addToReplayRecord(figObj) {
-                /*
-                var newRec = [figObj.turn, figObj.type, figObj.x, figObj.y];
-                replayRecord.push(newRec);
-                console.log(newRec);
-                */
             }
 
             function drawNextFigHint(figObj) {
@@ -524,45 +534,97 @@
 
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 4; j++) {
-                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, ctxHint);
+                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, '.prevcell');
                     }
                 }
             }
 
-            function updateCellColor(x, y, colorIndex, ctx) {
-                var xx = x * size,
-                    yy = y * size;
+            function updateCellColor(x, y, colorIndex, pefix) {
+                var $cell = $(pefix + x + '-' + y);
 
-                ctx.beginPath();
-                ctx.lineWidth="2";
-                ctx.strokeStyle="#DDDDDD";
-                ctx.rect(xx, yy, size - 1, size - 1);
-                ctx.stroke();
-
-                ctx.fillStyle = figColors[colorIndex];
-                ctx.fillRect(xx, yy, size - 1, size - 1);                  
+                $cell.removeClass(cellClasses.join(' '))
+                    .addClass(cellClasses[colorIndex]);
             }
 
+var lastCalledTime,
+	fps = 0,
+	fpsm = 0,
+	fpsi = 0;
+function requestAnimFrame() {
+  if(!lastCalledTime) {
+     lastCalledTime = performance.now();
+     fps = 0;
+     return;
+  }
+  delta = (performance.now() - lastCalledTime)/1000;
+  lastCalledTime = performance.now();
+  fps = 1/delta;
+}
+
             function drawAllCells(stk) {
+				requestAnimFrame();
                 var i,
                     j;
 
                 for (i = 0; i < ncol; i++) {
                     for (j = 0; j < nrow; j++) {
-						if (!oldStkn[i] || oldStkn[i][j] != stk[i][j]) {
-							updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, ctxMain);
-						}
+                        updateCellColor(i, j, stk[i] && stk[i][j] ? stk[i][j] : 0, '.cell');
                     }
-                }                                
-				oldStkn = $.extend(true, {}, stk);
+                }                  
+				requestAnimFrame();
+				if (fps) {
+					fpsi++;
+					fpsm += fps; 
+				}
+				$('.fps').html((fpsm / fpsi).toFixed(2));
+				
             }
 
-            function prepareAllCells() {
+            function prepareAllCells($container, $prev) {
                 var i,
-                    arr = [];                
+                    j,
+                    arr = [],
+                    cls,
+                    $newcell,
+                    l,
+                    t;
 
                 for (i = 0; i < ncol; i++) {
-                    arr[i] = [];                    
+                    arr[i] = [];
+                    for (j = 0; j < nrow; j++) {
+                        arr[i][j] = 0;
+                        cls = 'cell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
+                        t = j * size;
+
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
+
+                        $container.append($newcell);
+                    }
+                }
+
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 4; j++) {
+                        cls = 'prevcell' + i + '-' + j + ' cell ' + cellClasses[0];
+                        $newcell = $("<div class='" + cls + "'></div>");
+                        l = i * size;
+                        t = j * size;
+
+                        $newcell.width(size)
+                            .height(size)
+                            .css({
+                                'left': l,
+                                'top': t
+                            });
+
+                        $prev.append($newcell);
+                    }
                 }
                 return arr;
             }
@@ -624,6 +686,7 @@
                         highscore = data;
                         showHighScoreTable(highscore, highLightId);
                     });
+
             }
 
             function showHighScoreTable(hscore, highLightId) {
@@ -714,7 +777,7 @@
 </head>
 <body>
 <div class="infoContainer">
-    <div class="prev"><canvas id='canvaHint'>...</canvas></div>
+    <div class="prev"></div>
     <div class="score_container">
         Score: <span class="score"></span>
         Lines: <span class="lines"></span>
@@ -729,12 +792,10 @@
             <li>Loading... &#9203;</li>
         </ul>
     </div>
-
+	<span class="fps">-</span>fps
     <button class="startButton">Start</button>
 </div>
-
 <div class="stkn">
-    <canvas id='canvaMain'>Please update browser</canvas>
     <div class="gameover">
         <h3>Gameover</h3>
         <div class="resultContainer">
