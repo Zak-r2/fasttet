@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.2</title>
+    <title>FastTet v1.3beta</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
@@ -138,6 +138,43 @@
             font-size: 32px;
             padding: 10px 20px;
         }
+        .startButton div{
+            font-size: 12px;
+            color: #bbb;
+        }
+        
+		.description {
+            list-style-type: none;
+		}
+		.description li:before {
+			content: '✗';
+			color: red;
+			margin-right: 8px;
+		}
+		.description li.inprogress:before {
+			content: "\2692";
+			color: orange;			
+		}		        
+		.description li.done:before {
+			content: '✓';
+			color: green;			
+		}		
+        .newOffer {
+            font-size: 45px;
+            color: yellow;        
+
+            z-index: 1;
+        }
+        .newOffer span {
+            font-size: 12px;
+            color: red;           
+
+            position: relative;
+            left: 40px;
+            top: -10px;
+            z-index: 2;
+        }
+
     </style>
     <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
     <script>
@@ -169,44 +206,44 @@
                 localPlayersList = [],
                 ctxMain,
                 ctxHint,
-                figColors = ['#ffffff','#00f0f0','#0000f0','#f0a000','#f0f000','#00f000','#a000f0','#f00000'],
+                figColors = ['#ffffff', '#00f0f0', '#00f000', '#f00000', '#f0a000', '#0000f0', '#f0a000', '#ad4d9c'],
 
                 // Array[figType][figTurn][col][row] value = color number
                 figs = [[
-                    [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],  // fig l
-                    [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]],
-                    [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
-                    [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
-                ], [
-                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]], // fig z				
-                    [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]],
-                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]],
-                    [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]]
-                ], [
-                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]], // fig s					
-                    [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]],
-                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]],
-                    [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]]
+                    [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]], // fig l
+                    [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],
+                    [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+                    [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]]                    
                 ], [
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]], // fig o					
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 5, 0, 0], [0, 5, 0, 0], [0, 5, 5, 0], [0, 0, 0, 0]], // fig L					
-                    [[0, 0, 0, 0], [0, 5, 5, 5], [0, 5, 0, 0], [0, 0, 0, 0]],
-                    [[0, 0, 0, 0], [0, 5, 5, 0], [0, 0, 5, 0], [0, 0, 5, 0]],
-                    [[0, 0, 0, 0], [0, 0, 5, 0], [5, 5, 5, 0], [0, 0, 0, 0]]
+                    [[0, 0, 0, 0], [0, 5, 5, 0], [0, 0, 5, 0], [0, 0, 5, 0]], // fig J					
+                    [[0, 0, 0, 0], [0, 0, 0, 0], [0, 5, 5, 5], [0, 5, 0, 0]],
+                    [[0, 0, 0, 0], [0, 0, 5, 0], [0, 0, 5, 0], [0, 0, 5, 5]],
+                    [[0, 0, 0, 0], [0, 0, 0, 5], [0, 5, 5, 5], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 6, 0], [0, 0, 6, 0], [0, 6, 6, 0], [0, 0, 0, 0]], // fig J					
-                    [[0, 0, 0, 0], [0, 6, 0, 0], [0, 6, 6, 6], [0, 0, 0, 0]],
-                    [[0, 0, 0, 0], [0, 6, 6, 0], [0, 6, 0, 0], [0, 6, 0, 0]],
-                    [[0, 0, 0, 0], [6, 6, 6, 0], [0, 0, 6, 0], [0, 0, 0, 0]]
+                    [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 6, 0], [0, 6, 6, 0]], // fig L					
+                    [[0, 0, 0, 0], [0, 0, 0, 0], [0, 6, 6, 6], [0, 0, 0, 6]],
+                    [[0, 0, 0, 0], [0, 0, 6, 6], [0, 0, 6, 0], [0, 0, 6, 0]],
+                    [[0, 0, 0, 0], [0, 6, 0, 0], [0, 6, 6, 6], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 0, 0], [7, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]], // fig T					
-                    [[0, 7, 0, 0], [7, 7, 0, 0], [0, 7, 0, 0], [0, 0, 0, 0]],
+                    [[0, 7, 0, 0], [7, 7, 0, 0], [0, 7, 0, 0], [0, 0, 0, 0]], // fig T					
                     [[0, 7, 0, 0], [7, 7, 7, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
-                    [[0, 7, 0, 0], [0, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]]
+                    [[0, 7, 0, 0], [0, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]],
+					[[0, 0, 0, 0], [7, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]], // fig s				
+                    [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]],
+                    [[0, 0, 0, 2], [0, 0, 2, 2], [0, 0, 2, 0], [0, 0, 0, 0]],
+                    [[0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0], [0, 0, 0, 0]]
+                ], [
+                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]], // fig z					
+                    [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]],
+                    [[0, 0, 3, 0], [0, 0, 3, 3], [0, 0, 0, 3], [0, 0, 0, 0]],
+                    [[0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ]
                 ],
                 figsOffsetY = [
@@ -231,7 +268,6 @@
                 $stkn.width(size * ncol)
                      .height(size * nrow);
 
-
                 ctxMain = document.getElementById("canvaMain").getContext('2d');
                 ctxHint = document.getElementById("canvaHint").getContext('2d');
 
@@ -241,11 +277,15 @@
                 ctxHint.canvas.height =(size * 4);
                 ctxHint.canvas.width = (size * 4);
 
-
                 figoffsetx = Math.floor(ncol / 2) - 2;
 
                 loadHighScoreTable();
                 $startButton.on('click', startNewGame);
+                $(document).on('keydown.start', function(e){
+                    if (e.keyCode == 13 && $startButton.is(":visible")) startNewGame();
+                });
+                
+                makeFigTest();            
             }
 
             function startNewGame() {
@@ -263,7 +303,7 @@
                 loadLoacalPlayers();
 
                 setSpeed(level);
-                $(document).keydown(onKeyDown);
+                $(document).on('keydown.control', onKeyDown);
                 $(window).blur(function () {
                     paused = true;
                     move(0, 0);
@@ -498,9 +538,34 @@
                 return fig;
             }
 
-            function makeFig() {
-                var ty = Math.floor(Math.random() * 7),
-                    tu = Math.floor(Math.random() * 4);
+            function makeFigTest() {            
+                var i, 
+                    f,
+                    res = [],
+                    sh = ['l', 'O', 'J', 'L', 'T', 'S', 'Z'];
+                
+                for (i = 0; i < 100000; i++) {
+                    f = makeFig();
+                    if (res[f.type]) {
+                        res[f.type]++;
+                    } else {
+                        res[f.type] = 1;
+                    }
+                }
+                for (i = 0; i < 7; i++) {
+                    console.log(sh[i], ' : ' , res[i]);
+                }                
+            }
+            
+            function makeFig() { // random 6 system
+            
+                var ty = Math.floor(Math.random() * 6),
+                    tu = 0;
+                    
+                if (ty == 5) {
+                    ty += Math.floor(Math.random() + 0.5);
+                }
+                    
                 return {
                     type: ty,
                     turn: tu,
@@ -569,7 +634,7 @@
 
             function gameOver() {
                 clearTimeout(timer);
-                $(document).off('keydown');
+                $(document).off('keydown.control');
                 $('.gameover').show();
                 if (linesCnt > 0) {
                     $('.resultContainer').show();
@@ -577,7 +642,7 @@
                     $('.userName').get(0).focus();
                 } else {
                     $('.resultContainer').hide();
-                    $startButton.show();
+                    $startButton.show();                    
                 }
             }
 
@@ -729,8 +794,8 @@
             <li>Loading... &#9203;</li>
         </ul>
     </div>
-
-    <button class="startButton">Start</button>
+    <button class="startButton">Start<div>Enter</div></button>    
+    <span class="newOffer"><span>New</span>&#9734;</span>random system
 </div>
 
 <div class="stkn">
@@ -752,6 +817,31 @@
         <h3>Pause</h3>
         <div>press ESC or P to continue</div>
     </div>
+</div>
+<div style="display:none">
+    <h2>Tetris Guideline requirements</h2>
+    <ul class="description">
+        <li class="done">Playfield is 10 cells wide and at least 22 cells tall, where rows above 20 are hidden or obstructed by the field frame
+        <li class="done">Tetromino colors: Cyan I, Yellow O, Purple T, Green S, Red Z, Blue J, Orange L
+        <li class="inprogress">Tetromino start locations
+            <ul>
+                <li class="inprogress">The I and O spawn in the middle columns</li>
+                <li class="inprogress">The rest spawn in the left-middle columns</li>
+            </ul>    
+        </li>
+        <li class="done">The tetrominoes spawn horizontally and with their flat side pointed down.</li>
+        <li class="inprogress">Super Rotation System (SRS) specifies tetromino rotation</li>
+        <li>Standard mappings for computer keyboards</li>
+        <li>So-called Random Generator (also called "random bag" or "7 system")</li>
+        <li>"Hold piece": The player can press a button to send the falling tetromino to the hold box, and any tetromino that had been in the hold box moves to the top of the screen and begins falling. Hold cannot be used again until after the piece locks down. Games on platforms with fewer than eight usable buttons (such as the version on iPod) may skip this feature. The combination of hold piece and Random Generator would appear to allow the player to play forever.</li>
+        <li class="inprogress">Game must have ghost piece function.</li>
+        <li>Terms used in the user manual: "Tetriminos" not "tetrominoes" nor "tetrads" nor "pieces", letter names not "square" nor "stick", etc.</li>
+        <li>Designated soft drop speed. Details vary between guideline versions.</li>
+        <li>Player may only level up by clearing lines or performing T-Spin. Required lines depends in the game.</li>
+        <li>The game must use a variant of Roger Dean's Tetris logo, although this was true from around 2000 - before the guidelines emerged.</li>
+        <li>Game must include a song called Korobeiniki. (Guideline 2005~)</li>
+        <li class="done">The player tops out when a piece is spawned overlapping at least one block, or a piece locks completely above the visible portion of the playfield.</li>
+    </ul>
 </div>
 </body>
 </html>
