@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.3beta2</title>
+    <title>FastTet v1.3beta3</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
@@ -190,14 +190,14 @@
                 $prev,
                 timer,
                 level,
-                fig,
-                nextFig,
+                tetromino,
+                nextTetromino,
                 fall = false,
                 paused = false,
                 score = 0,
                 linesCnt = 0,
                 $startButton,
-                figoffsetx,
+                tetrominoOffsetx,
                 delaysByLevel = [1000, 850, 750, 550, 400, 300, 250, 200, 100, 50],
                 highscore = [],
                 highscorePage = 0,
@@ -206,41 +206,41 @@
                 localPlayersList = [],
                 ctxMain,
                 ctxHint,
-                figColors = ['#ffffff', '#00FFFF', '#00f000', '#f00000', '#EFEF00', '#0000f0', '#FF7C00', '#C200FF'],
+                tetrominoColors = ['#ffffff', '#00FFFF', '#00f000', '#f00000', '#EFEF00', '#0000f0', '#FF7C00', '#C200FF'],
 
-                // Array[figType][figTurn][col][row] value = color number
-                figs = [[
-                    [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],// fig l
+                // Array[tetrominoType][tetrominoTurn][col][row] value = color number
+                tetrominos = [[
+                    [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],// tetromino l
                     [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]],
                     [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],  
                     [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]], // fig o					
+                    [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]], // tetromino o					
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]],
                     [[0, 0, 0, 0], [0, 4, 4, 0], [0, 4, 4, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 0, 0], [0, 5, 5, 0], [0, 0, 5, 0], [0, 0, 5, 0]], // fig J					
-                    [[0, 0, 0, 0], [0, 0, 0, 0], [0, 5, 5, 5], [0, 5, 0, 0]],
-                    [[0, 0, 0, 0], [0, 0, 5, 0], [0, 0, 5, 0], [0, 0, 5, 5]],
-                    [[0, 0, 0, 0], [0, 0, 0, 5], [0, 5, 5, 5], [0, 0, 0, 0]]
+                    [[0, 5, 5, 0], [0, 0, 5, 0], [0, 0, 5, 0], [0, 0, 0, 0]], // tetromino J					
+                    [[0, 0, 0, 0], [0, 5, 5, 5], [0, 5, 0, 0], [0, 0, 0, 0]],
+                    [[0, 0, 5, 0], [0, 0, 5, 0], [0, 0, 5, 5], [0, 0, 0, 0]],
+                    [[0, 0, 0, 5], [0, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 6, 0], [0, 6, 6, 0]], // fig L					
-                    [[0, 0, 0, 0], [0, 0, 0, 0], [0, 6, 6, 6], [0, 0, 0, 6]],
-                    [[0, 0, 0, 0], [0, 0, 6, 6], [0, 0, 6, 0], [0, 0, 6, 0]],
-                    [[0, 0, 0, 0], [0, 6, 0, 0], [0, 6, 6, 6], [0, 0, 0, 0]]
+                    [[0, 0, 6, 0], [0, 0, 6, 0], [0, 6, 6, 0], [0, 0, 0, 0]], // tetromino L					
+                    [[0, 0, 0, 0], [0, 6, 6, 6], [0, 0, 0, 6], [0, 0, 0, 0]],
+                    [[0, 0, 6, 6], [0, 0, 6, 0], [0, 0, 6, 0], [0, 0, 0, 0]],
+                    [[0, 6, 0, 0], [0, 6, 6, 6], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ], [
                     [[0, 7, 0, 0], [7, 7, 0, 0], [0, 7, 0, 0], [0, 0, 0, 0]],
-                    [[0, 0, 0, 0], [7, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]],  // fig T
+                    [[0, 0, 0, 0], [7, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]],  // tetromino T
                     [[0, 7, 0, 0], [0, 7, 7, 0], [0, 7, 0, 0], [0, 0, 0, 0]],                    
                     [[0, 7, 0, 0], [7, 7, 7, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]], // fig s				
+                    [[0, 0, 2, 0], [0, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 0]], // tetromino s				
                     [[0, 0, 0, 0], [0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0]],
                     [[0, 0, 0, 2], [0, 0, 2, 2], [0, 0, 2, 0], [0, 0, 0, 0]],
                     [[0, 2, 2, 0], [0, 0, 2, 2], [0, 0, 0, 0], [0, 0, 0, 0]]
                 ], [
-                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]], // fig z					
+                    [[0, 3, 0, 0], [0, 3, 3, 0], [0, 0, 3, 0], [0, 0, 0, 0]], // tetromino z					
                     [[0, 0, 0, 0], [0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0]],
                     [[0, 0, 3, 0], [0, 0, 3, 3], [0, 0, 0, 3], [0, 0, 0, 0]],
                     [[0, 0, 3, 3], [0, 3, 3, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
@@ -267,7 +267,7 @@
                 ctxHint.canvas.height =(size * 4);
                 ctxHint.canvas.width = (size * 4);
 
-                figoffsetx = Math.floor(ncol / 2) - 2;
+                tetrominoOffsetx = Math.floor(ncol / 2) - 2;
 
                 loadHighScoreTable();
                 $startButton.on('click', startNewGame);
@@ -275,7 +275,7 @@
                     if (e.keyCode == 13 && $startButton.is(":visible")) startNewGame();
                 });
                 
-                makeFigTest();            
+                makeTetrominoTest();            
             }
 
             function startNewGame() {
@@ -285,9 +285,9 @@
                 linesCnt = 0;
                 level = 0;
                 stkn = prepareAllCells();
-                fig = getNewFig();
+                tetromino = getNewTetromino();
 
-                drawAllCells(getAddition(stkn, fig).arr);
+                drawAllCells(getAddition(stkn, tetromino).arr);
                 updateScore();
                 showHighScoreTable(highscore);
                 loadLoacalPlayers();
@@ -333,17 +333,17 @@
                 }
             }
 
-            function holdThisFigAndGetNext() {
-                stkn = getAddition(stkn, fig).arr;
-                fig = getNewFig();
+            function holdThisTetrominoAndGetNext() {
+                stkn = getAddition(stkn, tetromino).arr;
+                tetromino = getNewTetromino();
 
-                if (getAddition(stkn, fig).intersect) {
+                if (getAddition(stkn, tetromino).intersect) {
                     gameOver();
                     return;
                 }
                 removeLines(getFullLinesArray(stkn));
-                drawAllCells(getAddition(stkn, fig).arr);
-                addToReplayRecord(fig);                
+                drawAllCells(getAddition(stkn, tetromino).arr);
+                addToReplayRecord(tetromino);                
             }
 
             function removeLines(fullRowIndexes) {
@@ -389,117 +389,117 @@
             }
 
             function move(x, y) {                
-                var nextFigState = $.extend(true, {}, fig),
+                var nextTetrominoState = $.extend(true, {}, tetromino),
                     unionObj;
 
                 $('.pause').toggle(paused);
                 if (paused) return;
 
-                nextFigState.x += x;
-                nextFigState.y += y;
+                nextTetrominoState.x += x;
+                nextTetrominoState.y += y;
 
                 if (fall) {
-                    nextFigState.y += 1;
-                    if (getAddition(stkn, nextFigState).intersect || isOutOfBoundsY(nextFigState)) {
+                    nextTetrominoState.y += 1;
+                    if (getAddition(stkn, nextTetrominoState).intersect || isOutOfBoundsY(nextTetrominoState)) {
                         fall = false;
                     }
-                    nextFigState.y -= 1;
+                    nextTetrominoState.y -= 1;
                     setSpeed(level);
                 }
 
-                if (!checkBounds(nextFigState)) return false;
+                if (!checkBounds(nextTetrominoState)) return false;
 
-                unionObj = getAddition(stkn, nextFigState);
+                unionObj = getAddition(stkn, nextTetrominoState);
                 if (!unionObj.intersect) {
-                    fig = nextFigState;
+                    tetromino = nextTetrominoState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(nextFigState);
+                    addToReplayRecord(nextTetrominoState);
                 } else {
                     if (y == 0) return false;
-                    holdThisFigAndGetNext();
+                    holdThisTetrominoAndGetNext();
                 }
             }
 
             function turn(direction) {
-                var nextFigState = $.extend(true, {}, fig),
+                var nextTetrominoState = $.extend(true, {}, tetromino),
                     unionObj;
 
                 if (paused) return;
 
-                nextFigState.turn += direction;
-                if (nextFigState.turn > 3) nextFigState.turn = 0;
-                if (nextFigState.turn < 0) nextFigState.turn = 3;
+                nextTetrominoState.turn += direction;
+                if (nextTetrominoState.turn > 3) nextTetrominoState.turn = 0;
+                if (nextTetrominoState.turn < 0) nextTetrominoState.turn = 3;
 
-                if (!checkBounds(nextFigState)) return false;
+                if (!checkBounds(nextTetrominoState)) return false;
 
-                unionObj = getAddition(stkn, nextFigState);
+                unionObj = getAddition(stkn, nextTetrominoState);
                 if (!unionObj.intersect) {
-                    fig = nextFigState;
+                    tetromino = nextTetrominoState;
                     drawAllCells(unionObj.arr);
-                    addToReplayRecord(fig);
+                    addToReplayRecord(tetromino);
                 } else {
                     return false;
                 }
             }
 
-            function checkBounds(figObj) {
-                if (isOutOfBoundsX(figObj)) {
+            function checkBounds(tetrominoObj) {
+                if (isOutOfBoundsX(tetrominoObj)) {
                     return false;
                 }
-                if (isOutOfBoundsY(figObj)) {
-                    holdThisFigAndGetNext();
+                if (isOutOfBoundsY(tetrominoObj)) {
+                    holdThisTetrominoAndGetNext();
                     return false;
                 }
                 return true;
             }
 
-            function isOutOfBoundsX(figObj) {
+            function isOutOfBoundsX(tetrominoObj) {
                 var i,
                     j,
-                    figArr = figs[figObj.type][figObj.turn];
+                    tetrominoArr = tetrominos[tetrominoObj.type][tetrominoObj.turn];
 
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 4; j++) {
-                        if (figArr[i][j] && i + figObj.x > ncol - 1) return true;
-                        if (figArr[i][j] && i + figObj.x < 0) return true;
+                        if (tetrominoArr[i][j] && i + tetrominoObj.x > ncol - 1) return true;
+                        if (tetrominoArr[i][j] && i + tetrominoObj.x < 0) return true;
                     }
                 }
                 return false;
             }
 
-            function isOutOfBoundsY(figObj) {
+            function isOutOfBoundsY(tetrominoObj) {
                 var i,
                     j,
-                    figArr = figs[figObj.type][figObj.turn];
+                    tetrominoArr = tetrominos[tetrominoObj.type][tetrominoObj.turn];
 
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 4; j++) {
-                        if (figArr[i][j] && j + figObj.y > nrow - 1) return true;
+                        if (tetrominoArr[i][j] && j + tetrominoObj.y > nrow - 1) return true;
                     }
                 }
                 return false;
             }
 
-            function getAddition(targ, figObj) {
+            function getAddition(targ, tetrominoObj) {
                 var i,
                     j,
                     result = $.extend(true, [], targ),
-                    figArr = figs[figObj.type][figObj.turn],
+                    tetrominoArr = tetrominos[tetrominoObj.type][tetrominoObj.turn],
                     nx,
                     ny;
 
 
                 for (i = 0; i < 4; i++) {
-                    nx = i + figObj.x;
+                    nx = i + tetrominoObj.x;
 
                     for (j = 0; j < 4; j++) {
-                        ny = j + figObj.y;
+                        ny = j + tetrominoObj.y;
 
                         if (nx > -1 && ny > -1 && nx < ncol && ny < nrow) {
 
                             if (targ[nx][ny]) {
 
-                                if (figArr[i][j]) {
+                                if (tetrominoArr[i][j]) {
 
                                     result[nx][ny] = 1;
                                     return {
@@ -509,7 +509,7 @@
 
                                 }
                             } else {
-                                result[nx][ny] = figArr[i][j];
+                                result[nx][ny] = tetrominoArr[i][j];
                             }
                         }
                     }
@@ -520,22 +520,22 @@
                 };
             }
 
-            function getNewFig() {
-                var fig = nextFig ? $.extend(true, {}, nextFig) : makeFig();
+            function getNewTetromino() {
+                var tetromino = nextTetromino ? $.extend(true, {}, nextTetromino) : makeTetromino();
 
-                nextFig = makeFig();
-                drawNextFigHint(nextFig);
-                return fig;
+                nextTetromino = makeTetromino();
+                drawNextTetrominoHint(nextTetromino);
+                return tetromino;
             }
 
-            function makeFigTest() {            
+            function makeTetrominoTest() {            
                 var i, 
                     f,
                     res = [],
                     sh = ['l', 'O', 'J', 'L', 'T', 'S', 'Z'];
                 
                 for (i = 0; i < 100000; i++) {
-                    f = makeFig();
+                    f = makeTetromino();
                     if (res[f.type]) {
                         res[f.type]++;
                     } else {
@@ -547,7 +547,7 @@
                 }                
             }
             
-            function makeFig() { // random 6 system
+            function makeTetromino() { // random 6 system
             
                 var ty = Math.floor(Math.random() * 6),
                     tu = 0;
@@ -555,30 +555,34 @@
                 if (ty == 5) {
                     ty += Math.floor(Math.random() + 0.5);
                 }
+                    
+                //var zz = 2;            
+                //ty = zz > 6 ? zz = 0 : zz++;
+
                 return {
                     type: ty,
                     turn: tu,
-                    x: figoffsetx,
+                    x: tetrominoOffsetx,
                     y: -1
                 };
             }
 
-            function addToReplayRecord(figObj) {
+            function addToReplayRecord(tetrominoObj) {
                 /*
-                var newRec = [figObj.turn, figObj.type, figObj.x, figObj.y];
+                var newRec = [tetrominoObj.turn, tetrominoObj.type, tetrominoObj.x, tetrominoObj.y];
                 replayRecord.push(newRec);
                 console.log(newRec);
                 */
             }
 
-            function drawNextFigHint(figObj) {
+            function drawNextTetrominoHint(tetrominoObj) {
                 var i,
                     j,
-                    fig = figs[figObj.type][figObj.turn];
+                    tetromino = tetrominos[tetrominoObj.type][tetrominoObj.turn];
 
                 for (i = 0; i < 4; i++) {
                     for (j = 0; j < 4; j++) {
-                        updateCellColor(i, j, fig[i][j] ? fig[i][j] : 0, ctxHint);
+                        updateCellColor(i, j, tetromino[i][j] ? tetromino[i][j] : 0, ctxHint);
                     }
                 }
             }
@@ -593,7 +597,7 @@
                 ctx.rect(xx, yy, size - 1, size - 1);
                 ctx.stroke();
 
-                ctx.fillStyle = figColors[colorIndex];
+                ctx.fillStyle = tetrominoColors[colorIndex];
                 ctx.fillRect(xx, yy, size - 1, size - 1);                  
             }
 
