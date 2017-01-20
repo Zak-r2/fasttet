@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastTet v1.3beta3</title>
+    <title>FastTet v1.3</title>
     <style>
         body, html, h3, div, span, input, button {
             font-family: arial, sans-serif;
@@ -159,21 +159,6 @@
 			content: '✓';
 			color: green;			
 		}		
-        .newOffer {
-            font-size: 45px;
-            color: yellow;        
-
-            z-index: 1;
-        }
-        .newOffer span {
-            font-size: 12px;
-            color: red;           
-
-            position: relative;
-            left: 40px;
-            top: -10px;
-            z-index: 2;
-        }
 
     </style>
     <script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.js"></script>
@@ -192,6 +177,7 @@
                 level,
                 tetromino,
                 nextTetromino,
+                _randomBag,
                 fall = false,
                 paused = false,
                 score = 0,
@@ -547,21 +533,35 @@
                 }                
             }
             
-            function makeTetromino() { // random 6 system
+            function makeTetromino() { // random 7bag system
             
-                var ty = Math.floor(Math.random() * 6),
-                    tu = 0;
-                    
-                if (ty == 5) {
-                    ty += Math.floor(Math.random() + 0.5);
+                var ty,
+                    createNew7Bag = function() {
+                        var bag = [0, 1, 2, 3, 4, 5, 6],
+                            result = [],
+                            i,
+                            r;
+
+                        for (i = 0; i < 7; i++) {
+                            r = Math.floor(Math.random() * (bag.length - 1));
+                            result.push(bag.splice(r, 1)[0]);
+                        }
+                        return result;
+                    }
+
+                if (!_randomBag || !_randomBag.length) {
+                    _randomBag = createNew7Bag();
                 }
+
+                ty = _randomBag.pop();
                     
                 //var zz = 2;            
                 //ty = zz > 6 ? zz = 0 : zz++;
+                //ty = 0;
 
                 return {
                     type: ty,
-                    turn: tu,
+                    turn: 0,
                     x: tetrominoOffsetx,
                     y: -1
                 };
@@ -788,7 +788,7 @@
         </ul>
     </div>
     <button class="startButton">Start<div>Enter</div></button>    
-    <span class="newOffer"><span>New</span>&#9734;</span>random system
+    <span class="newOffer">&#9734; 7 bag random system</span>
 </div>
 
 <div class="stkn">
